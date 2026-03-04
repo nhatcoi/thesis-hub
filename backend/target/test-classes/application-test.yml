@@ -1,9 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/thesis_management
-    username: sad_admin
-    password: sad_secret_2026
-  jpa:
-    show-sql: false
-  liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.yaml
