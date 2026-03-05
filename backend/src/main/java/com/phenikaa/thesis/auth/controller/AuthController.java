@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
 
 /**
- * Auth API: Angular gửi Bearer token → Backend validate (JWT hoặc opaque) → trả user info.
+ * Auth API: Angular gửi Bearer token → Backend validate (JWT hoặc opaque) → trả
+ * user info.
  */
 @RestController
 @RequestMapping("/api/auth")
@@ -37,6 +38,10 @@ public class AuthController {
 
         Map<String, Object> claims = extractClaims(auth);
         User localUser = userSyncService.syncFromClaims(claims);
+
+        if (localUser == null) {
+            return ResponseEntity.status(401).body(ApiResponse.error("Tài khoản không tồn tại trong hệ thống."));
+        }
 
         Map<String, Object> info = new LinkedHashMap<>();
         info.put("sub", claims.get("sub"));

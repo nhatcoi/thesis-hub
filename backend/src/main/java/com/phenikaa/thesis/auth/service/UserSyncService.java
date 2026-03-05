@@ -1,8 +1,6 @@
 package com.phenikaa.thesis.auth.service;
 
 import com.phenikaa.thesis.user.entity.User;
-import com.phenikaa.thesis.user.entity.enums.UserRole;
-import com.phenikaa.thesis.user.entity.enums.UserStatus;
 import com.phenikaa.thesis.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +28,8 @@ public class UserSyncService {
         final String givenName = str(claims, "given_name") != null ? str(claims, "given_name") : "";
         final String familyName = str(claims, "family_name") != null ? str(claims, "family_name") : "";
         final String username = str(claims, "preferred_username") != null
-                ? str(claims, "preferred_username") : email;
+                ? str(claims, "preferred_username")
+                : email;
 
         User user = userRepository.findByExternalId(sub)
                 .or(() -> userRepository.findByEmail(email))
@@ -38,24 +37,15 @@ public class UserSyncService {
                 .orElse(null);
 
         if (user == null) {
-            user = User.builder()
-                    .externalId(sub)
-                    .username(username)
-                    .email(email)
-                    .firstName(givenName)
-                    .lastName(familyName)
-                    .role(UserRole.STUDENT)
-                    .status(UserStatus.ACTIVE)
-                    .lastLoginAt(OffsetDateTime.now())
-                    .build();
-        } else {
-            if (user.getExternalId() == null) {
-                user.setExternalId(sub);
-            }
-            user.setFirstName(givenName);
-            user.setLastName(familyName);
-            user.setLastLoginAt(OffsetDateTime.now());
+            return null; // Let the caller decide how to handle missing user (e.g. blocking login)
         }
+
+        if (user.getExternalId() == null) {
+            user.setExternalId(sub);
+        }
+        user.setFirstName(givenName);
+        user.setLastName(familyName);
+        user.setLastLoginAt(OffsetDateTime.now());
 
         return userRepository.save(user);
     }
