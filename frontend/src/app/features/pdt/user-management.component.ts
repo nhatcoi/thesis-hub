@@ -70,7 +70,7 @@ type ImportType = 'STUDENT' | 'LECTURER';
                     <option value="">Tất cả vai trò</option>
                     <option value="STUDENT">Sinh viên</option>
                     <option value="LECTURER">Giảng viên</option>
-                    <option value="DEPT_HEAD">Trưởng bộ môn</option>
+                    <option value="DEPT_HEAD">Trưởng ngành</option>
                     <option value="TRAINING_DEPT">Phòng Đào tạo</option>
                     <option value="ADMIN">Quản trị viên</option>
                   </select>
@@ -152,9 +152,13 @@ type ImportType = 'STUDENT' | 'LECTURER';
                             <span class="text-[10px] text-gray-400 uppercase tracking-tighter" *ngIf="user.facultyName">{{ user.facultyName }}</span>
                           </div>
                         } @else if (hasRole(user, 'LECTURER') || hasRole(user, 'DEPT_HEAD')) {
-                           <div class="flex items-center gap-1.5">
-                              <mat-icon class="!text-[14px] !w-auto !h-auto text-gray-300">account_balance</mat-icon>
-                              <span>{{ user.facultyName || 'Chưa cập nhật khoa' }}</span>
+                           <div class="flex flex-col">
+                              <span class="font-medium text-indigo-700">{{ user.facultyName || 'Chưa cập nhật khoa' }}</span>
+                              @if (hasRole(user, 'DEPT_HEAD') && user.managedMajorName) {
+                                <span class="text-[10px] text-indigo-500 font-bold uppercase tracking-tighter">Trưởng ngành: {{ user.managedMajorName }}</span>
+                              } @else if (hasRole(user, 'DEPT_HEAD')) {
+                                <span class="text-[10px] text-red-400 italic">Chưa gán ngành quản lý</span>
+                              }
                            </div>
                         } @else {
                           <span class="text-gray-300">-</span>
@@ -372,7 +376,7 @@ type ImportType = 'STUDENT' | 'LECTURER';
                   class="block w-full rounded-xl border-gray-200 bg-gray-50/50 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2.5 border transition-all">
                   <option value="STUDENT">Sinh viên</option>
                   <option value="LECTURER">Giảng viên</option>
-                  <option value="DEPT_HEAD">Trưởng bộ môn</option>
+                  <option value="DEPT_HEAD">Trưởng ngành</option>
                   <option value="TRAINING_DEPT">Phòng Đào tạo</option>
                   <option value="ADMIN">Quản trị viên</option>
                 </select>
@@ -442,6 +446,19 @@ type ImportType = 'STUDENT' | 'LECTURER';
                   <input type="number" formControlName="maxStudentsPerBatch"
                     class="block w-full rounded-xl border-gray-200 bg-gray-50/50 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2.5 border">
                 </div>
+                
+                @if (form.get('role')?.value === 'DEPT_HEAD') {
+                  <div class="col-span-1">
+                     <label class="block text-sm font-semibold text-gray-700 mb-1.5 ml-1">Ngành quản lý <span class="text-red-500">*</span></label>
+                     <select formControlName="managedMajorCode"
+                       class="block w-full rounded-xl border-gray-200 bg-gray-50/50 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2.5 border">
+                       <option value="">Chọn ngành quản lý...</option>
+                       @for (m of getMajorsByFaculty(form.get('facultyCode')?.value); track m.code) {
+                         <option [value]="m.code">{{ m.name }}</option>
+                       }
+                     </select>
+                  </div>
+                }
               }
             </div>
 
@@ -517,6 +534,7 @@ export class UserManagementComponent implements OnInit {
     majorCode: [''],
     cohort: [''],
     facultyCode: [''],
+    managedMajorCode: [''],
     maxStudentsPerBatch: [5]
   });
 
@@ -572,6 +590,14 @@ export class UserManagementComponent implements OnInit {
   filteredMajors() {
     if (!this.facultyFilter) return this.majors();
     return this.majors().filter(m => m.facultyId === this.facultyFilter);
+  }
+
+  getMajorsByFaculty(facultyCode: string) {
+    if (!facultyCode) return this.majors();
+    // In metadata, faculties have 'code'. 
+    const faculty = this.faculties().find(f => f.code === facultyCode);
+    if (!faculty) return [];
+    return this.majors().filter(m => m.facultyId === faculty.id);
   }
 
   loadMetadata() {
@@ -675,7 +701,7 @@ export class UserManagementComponent implements OnInit {
     const labels: any = {
       'ADMIN': 'Quản trị viên',
       'TRAINING_DEPT': 'Phòng Đào tạo',
-      'DEPT_HEAD': 'Trưởng bộ môn',
+      'DEPT_HEAD': 'Trưởng ngành',
       'LECTURER': 'Giảng viên',
       'STUDENT': 'Sinh viên'
     };

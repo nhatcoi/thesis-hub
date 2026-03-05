@@ -1,17 +1,5 @@
-username,external_id,email,first_name,last_name,role,faculty_code,academic_rank,academic_degree,max_students_per_batch
-GV001,,gv001@phenikaa-uni.edu.vn,Anh,Nguyen,LECTURER,KHMT,Giảng viên,ThS,8
-GV002,,gv002@phenikaa-uni.edu.vn,Bao,Tran,LECTURER,KHMT,Giảng viên,TS,10
-GV003,,gv003@phenikaa-uni.edu.vn,Chi,Le,LECTURER,HTTT,Giảng viên,ThS,8
-GV004,,gv004@phenikaa-uni.edu.vn,Duy,Pham,LECTURER,HTTT,Giảng viên,TS,10
-GV005,,gv005@phenikaa-uni.edu.vn,Ha,Vu,LECTURER,MANG,Giảng viên,ThS,8
-GV006,,gv006@phenikaa-uni.edu.vn,Hieu,Nguyen,LECTURER,MANG,Giảng viên,TS,10
-GV007,,gv007@phenikaa-uni.edu.vn,Linh,Hoang,LECTURER,CKCDT,Giảng viên,ThS,8
-GV008,,gv008@phenikaa-uni.edu.vn,Minh,Truong,LECTURER,CKCDT,Giảng viên,TS,10
-GV009,,gv009@phenikaa-uni.edu.vn,Nam,Do,LECTURER,DIEN,Giảng viên,ThS,8
-GV010,,gv010@phenikaa-uni.edu.vn,Thao,Pham,LECTURER,DIEN,Giảng viên,TS,10
-GV011,,gv011@phenikaa-uni.edu.vn,Anh,Le,LECTURER,QTKD,Giảng viên,ThS,8
-GV012,,gv012@phenikaa-uni.edu.vn,Bich,Vu,LECTURER,QTKD,Giảng viên,TS,10
-GV013,,gv013@phenikaa-uni.edu.vn,Dang,Nguyen,LECTURER,Y,Giảng viên,ThS,8
-GV014,,gv014@phenikaa-uni.edu.vn,Giang,Tran,LECTURER,DUOC,Giảng viên,ThS,8
-GV015,,gv015@phenikaa-uni.edu.vn,Hoa,Do,LECTURER,KHMT,Giảng viên chính,TS,12
-
+username,external_id,email,first_name,last_name,role,faculty_code,max_students_per_batch,managed_major_code
+GV001,,gv001@phenikaa-uni.edu.vn,Anh,Nguyen,LECTURER,KHMT,8,
+GV002,,gv002@phenikaa-uni.edu.vn,Bao,Tran,LECTURER,KHMT,10,
+GV003,,gv015@phenikaa-uni.edu.vn,Hoa,Do,LECTURER,KHMT,12,
+GV004,,gv003@phenikaa-uni.edu.vn,Chi,Le,LECTURER,HTTT,8,

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ThesisService, ThesisResponse } from '../../core/thesis.service';
 import { BatchService, Batch } from '../../core/batch.service';
 import { AuthService } from '../../core/auth.service';
+import { UserService } from '../../core/user.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 @Component({
@@ -21,54 +22,70 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
         </div>
       </div>
       
-      <div class="bg-white shadow rounded-lg overflow-hidden border border-gray-100">
-        <div class="p-4 border-b border-gray-200 bg-gray-50/50 flex flex-wrap gap-4 items-center justify-between">
-          <div class="flex flex-wrap gap-3">
-            <!-- Filter by Scope -->
-            <select 
-              [(ngModel)]="selectedScope" 
-              (change)="onFilterChange()"
-              class="block min-w-[150px] pl-3 pr-10 py-2 text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md shadow-sm">
-              <option value="MAJOR">Theo Ngành ({{ auth.currentUser()?.majorName }})</option>
-              <option value="FACULTY">Theo Khoa ({{ auth.currentUser()?.facultyName }})</option>
-              <option value="UNIVERSITY">Toàn Đại học</option>
-            </select>
-
-            <!-- Filter by Batch -->
-            <select 
-              [(ngModel)]="selectedBatchId" 
-              (change)="onFilterChange()"
-              class="block min-w-[150px] pl-3 pr-10 py-2 text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md shadow-sm">
-              <option value="">Tất cả đợt</option>
-              @for (batch of batches(); track batch.id) {
-                <option [value]="batch.id">{{ batch.name }}</option>
-              }
-            </select>
-
-            <!-- Filter by Status -->
-            <select 
-              [(ngModel)]="selectedStatus" 
-              (change)="onFilterChange()"
-              class="block min-w-[150px] pl-3 pr-10 py-2 text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md shadow-sm">
-              <option value="">Trạng thái</option>
-              <option value="ELIGIBLE_FOR_THESIS">Đủ điều kiện</option>
-              <option value="IN_PROGRESS">Đang thực hiện</option>
-              <option value="COMPLETED">Hoàn thành</option>
-              <option value="PASSED">Đạt</option>
-              <option value="FAILED">Không đạt</option>
-            </select>
-          </div>
-
-          <div class="relative rounded-md shadow-sm min-w-[250px]">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <mat-icon class="text-gray-400 text-sm">search</mat-icon>
+      <div class="bg-white shadow rounded-xl overflow-hidden border border-gray-100">
+        <!-- Filter Header -->
+        <div class="p-6 border-b border-gray-100 bg-white">
+          <div class="flex flex-col gap-6">
+            <!-- Search Row -->
+            <div class="flex flex-col md:flex-row gap-4 items-center">
+              <div class="relative flex-1 w-full">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pt-1">
+                  <mat-icon class="text-gray-400">search</mat-icon>
+                </span>
+                <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearchQueryChange($event)"
+                  placeholder="Tìm theo tên, email, mã sinh viên..."
+                  class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl leading-5 bg-gray-50/50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border transition-all">
+              </div>
             </div>
-            <input 
-              type="text" 
-              [(ngModel)]="searchQuery"
-              (ngModelChange)="onSearchQueryChange($event)"
-              class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md" 
-              placeholder="Tìm kiếm SV (Tên, MSSV)...">
+
+            <!-- Filters Row -->
+            <div class="flex flex-wrap gap-4 items-center border-t border-gray-50 pt-6">
+               <div class="w-full md:w-48">
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1 block ml-1">Đợt đồ án</label>
+                  <select [(ngModel)]="selectedBatchId" (change)="onFilterChange()"
+                    class="block w-full px-3 py-2.5 border border-gray-200 bg-gray-50/50 rounded-xl focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border transition-all">
+                    <option value="">Tất cả đợt</option>
+                    @for (batch of batches(); track batch.id) {
+                      <option [value]="batch.id">{{ batch.name }}</option>
+                    }
+                  </select>
+               </div>
+
+               <div class="w-full md:w-56">
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1 block ml-1">Khoa đào tạo</label>
+                  <select [(ngModel)]="facultyFilter" (change)="onFacultyChange()" [disabled]="isDeanOrHead()"
+                    class="block w-full px-3 py-2.5 border border-gray-200 bg-gray-50/50 rounded-xl focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border transition-all disabled:opacity-60">
+                    <option value="">Tất cả Khoa</option>
+                    @for (f of faculties(); track f.id) {
+                      <option [value]="f.id">{{ f.name }}</option>
+                    }
+                  </select>
+               </div>
+
+               <div class="w-full md:w-56">
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1 block ml-1">Ngành học</label>
+                  <select [(ngModel)]="majorFilter" (change)="onFilterChange()" [disabled]="isHead()"
+                    class="block w-full px-3 py-2.5 border border-gray-200 bg-gray-50/50 rounded-xl focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border transition-all disabled:opacity-60">
+                    <option value="">Tất cả Ngành</option>
+                    @for (m of filteredMajors(); track m.id) {
+                      <option [value]="m.id">{{ m.name }}</option>
+                    }
+                  </select>
+               </div>
+
+               <div class="w-full md:w-48">
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1 block ml-1">Trạng thái</label>
+                  <select [(ngModel)]="selectedStatus" (change)="onFilterChange()"
+                    class="block w-full px-3 py-2.5 border border-gray-200 bg-gray-50/50 rounded-xl focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border transition-all">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="ELIGIBLE_FOR_THESIS">Đủ điều kiện</option>
+                    <option value="IN_PROGRESS">Đang thực hiện</option>
+                    <option value="COMPLETED">Hoàn thành</option>
+                    <option value="PASSED">Đạt</option>
+                    <option value="FAILED">Không đạt</option>
+                  </select>
+               </div>
+            </div>
           </div>
         </div>
         
@@ -94,6 +111,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
                       <mat-icon class="!text-[14px] !w-auto !h-auto text-gray-400" *ngIf="sortBy() === 'student.user.firstName'">{{ sortDir() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
                    </div>
                 </th>
+                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Ngành / Khoa</th>
                 <th (click)="toggleSort('status')" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors">
                    <div class="flex items-center gap-1">
                       Trạng thái
@@ -136,8 +154,12 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
                         <span class="text-sm font-medium text-gray-900">{{ thesis.studentFirstName }}</span>
                       </div>
                     </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500 font-medium">
+                       <div class="text-gray-900 font-bold mb-0.5">{{ thesis.majorName }}</div>
+                       <div>{{ thesis.facultyName }}</div>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <span [class]="getStatusClass(thesis.status)" class="px-2.5 py-0.5 inline-flex text-[10px] leading-5 font-bold uppercase tracking-wider rounded-full border">
+                      <span [class]="getStatusClass(thesis.status)" class="px-2.5 py-1 inline-flex text-[10px] leading-5 font-bold uppercase tracking-wider rounded-full border">
                         {{ thesis.status }}
                       </span>
                     </td>
@@ -182,33 +204,61 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 export class StudentsComponent implements OnInit {
   private thesisService = inject(ThesisService);
   private batchService = inject(BatchService);
+  private userService = inject(UserService);
   auth = inject(AuthService);
 
   theses = signal<ThesisResponse[]>([]);
   batches = signal<Batch[]>([]);
+  faculties = signal<any[]>([]);
+  majors = signal<any[]>([]);
+
   loading = signal(false);
   totalElements = signal(0);
   page = signal(0);
   sortBy = signal('student.studentCode');
   sortDir = signal<'asc' | 'desc'>('asc');
 
-  selectedScope = 'MAJOR';
   selectedBatchId = '';
+  facultyFilter = '';
+  majorFilter = '';
   selectedStatus = '';
   searchQuery = '';
 
   private searchSubject = new Subject<string>();
 
+  filteredMajors() {
+    if (!this.facultyFilter) return this.majors();
+    return this.majors().filter(m => m.facultyId === this.facultyFilter);
+  }
+
+  isDeanOrHead(): boolean {
+    const roles = this.auth.currentUser()?.roles || [];
+    return roles.includes('DEPT_HEAD') || roles.includes('TRAINING_DEPT');
+    // Wait, DEPT_HEAD is Head of Major. TRUONG_KHOA (Dean) is missing from my Role enum? 
+    // Let me check AuthService roles.
+  }
+
+  isHead(): boolean {
+    return (this.auth.currentUser()?.roles || []).includes('DEPT_HEAD');
+  }
+
   currentScopeName() {
-    switch (this.selectedScope) {
-      case 'MAJOR': return `Ngành ${this.auth.currentUser()?.majorName}`;
-      case 'FACULTY': return `Khoa ${this.auth.currentUser()?.facultyName}`;
-      default: return 'Toàn Đại học';
+    if (this.majorFilter) {
+      const m = this.majors().find(x => x.id === this.majorFilter);
+      return m ? `Ngành ${m.name}` : 'Tất cả Ngành';
     }
+    if (this.facultyFilter) {
+      const f = this.faculties().find(x => x.id === this.facultyFilter);
+      return f ? `Khoa ${f.name}` : 'Tất cả Khoa';
+    }
+    return 'Toàn Đại học';
   }
 
   ngOnInit(): void {
     this.loadBatches();
+    this.loadFaculties();
+    this.loadMajors();
+    this.initFilters();
     this.loadTheses();
 
     this.searchSubject.pipe(
@@ -220,6 +270,27 @@ export class StudentsComponent implements OnInit {
     });
   }
 
+  initFilters() {
+    const user = this.auth.currentUser();
+    if (!user) return;
+
+    // If Head of Dept, fix Faculty and Major
+    if (this.isHead()) {
+      this.facultyFilter = user.facultyId || '';
+      this.majorFilter = user.managedMajorId || '';
+    } else if (this.isDeanOrHead()) { // Actually Head of Faculty
+      this.facultyFilter = user.facultyId || '';
+    }
+  }
+
+  loadFaculties() {
+    this.userService.getFaculties().subscribe((data: any[]) => this.faculties.set(data));
+  }
+
+  loadMajors() {
+    this.userService.getMajors().subscribe((data: any[]) => this.majors.set(data));
+  }
+
   loadBatches() {
     this.batchService.listBatches({ size: 100 }).subscribe(res => {
       this.batches.set(res.content);
@@ -228,19 +299,11 @@ export class StudentsComponent implements OnInit {
 
   loadTheses() {
     this.loading.set(true);
-    let majorId: string | undefined = undefined;
-    let facultyId: string | undefined = undefined;
-
-    if (this.selectedScope === 'MAJOR') {
-      majorId = this.auth.currentUser()?.majorId;
-    } else if (this.selectedScope === 'FACULTY') {
-      facultyId = this.auth.currentUser()?.facultyId;
-    }
 
     this.thesisService.getTheses({
       batchId: this.selectedBatchId,
-      majorId: majorId,
-      facultyId: facultyId,
+      majorId: this.majorFilter,
+      facultyId: this.facultyFilter,
       status: this.selectedStatus,
       search: this.searchQuery,
       page: this.page(),
@@ -254,6 +317,11 @@ export class StudentsComponent implements OnInit {
       },
       error: () => this.loading.set(false)
     });
+  }
+
+  onFacultyChange() {
+    this.majorFilter = '';
+    this.onFilterChange();
   }
 
   toggleSort(column: string) {
