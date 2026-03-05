@@ -36,5 +36,6 @@ public class UserCreateRequest {
 
     // Lecturer specific fields
     private String facultyCode;
+    private String managedMajorCode;
     private Integer maxStudentsPerBatch;
 }

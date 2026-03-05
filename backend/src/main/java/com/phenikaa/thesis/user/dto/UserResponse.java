@@ -27,4 +27,6 @@ public class UserResponse {
     private String majorName;
     private java.util.UUID facultyId;
     private java.util.UUID majorId;
+    private java.util.UUID managedMajorId;
+    private String managedMajorName;
 }

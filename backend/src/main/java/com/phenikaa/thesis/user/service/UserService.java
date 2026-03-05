@@ -45,6 +45,13 @@ public class UserService {
     private final RoleRepository roleRepository;
 
     @Transactional(readOnly = true)
+    public UserResponse getById(UUID id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Không tìm thấy người dùng: " + id));
+        return mapToResponse(user);
+    }
+
+    @Transactional(readOnly = true)
     public Page<UserResponse> getUsers(String search, UserRole role, UUID facultyId, UUID majorId, Pageable pageable) {
         Specification<User> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -109,6 +116,9 @@ public class UserService {
             }
         }
 
+        UUID managedMajorId = null;
+        String managedMajorName = null;
+
         // Multi-role logic: search for profile if has lecturer or head role
         if (roleCodes.contains(UserRole.LECTURER) || roleCodes.contains(UserRole.DEPT_HEAD)) {
             Lecturer lecturer = lecturerRepository.findByUserId(user.getId()).orElse(null);
@@ -116,6 +126,21 @@ public class UserService {
                 if (lecturer.getFaculty() != null) {
                     facultyName = lecturer.getFaculty().getName();
                     userFacultyId = lecturer.getFaculty().getId();
+                }
+                // Correctly assign managedMajor information if code exists
+                String mCode = lecturer.getManagedMajorCode();
+                if (mCode != null && !mCode.isBlank()) {
+                    majorRepository.findByCode(mCode).ifPresent(m -> {
+                        // Using a final-assignment trick or just a direct local variable update
+                        // Since we are outside of a lambda here or we can just use the result
+                    });
+
+                    // Direct assignment search
+                    Major m = majorRepository.findByCode(mCode).orElse(null);
+                    if (m != null) {
+                        managedMajorId = m.getId();
+                        managedMajorName = m.getName();
+                    }
                 }
             }
         }
@@ -133,6 +158,8 @@ public class UserService {
                 .majorName(majorName)
                 .facultyId(userFacultyId)
                 .majorId(userMajorId)
+                .managedMajorId(managedMajorId)
+                .managedMajorName(managedMajorName)
                 .build();
     }
 
@@ -196,7 +223,7 @@ public class UserService {
 
     private void createLecturerProfile(User user, UserCreateRequest request) {
         if (request.getFacultyCode() == null) {
-            throw new BusinessException("Giảng viên/Trưởng bộ môn cần có mã khoa");
+            throw new BusinessException("Giảng viên/Trưởng ngành cần có mã khoa");
         }
         Faculty faculty = facultyRepository.findByCode(request.getFacultyCode())
                 .orElseThrow(() -> new BusinessException("Không tìm thấy khoa: " + request.getFacultyCode()));
@@ -205,6 +232,7 @@ public class UserService {
                 .user(user)
                 .lecturerCode(user.getUsername())
                 .faculty(faculty)
+                .managedMajorCode(request.getManagedMajorCode())
                 .maxStudentsPerBatch(request.getMaxStudentsPerBatch() != null ? request.getMaxStudentsPerBatch() : 5)
                 .build();
 

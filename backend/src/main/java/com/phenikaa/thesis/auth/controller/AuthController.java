@@ -23,10 +23,13 @@ public class AuthController {
 
     private final UserSyncService userSyncService;
     private final AuthGateService authGateService;
+    private final com.phenikaa.thesis.user.service.UserService userService;
 
-    public AuthController(UserSyncService userSyncService, AuthGateService authGateService) {
+    public AuthController(UserSyncService userSyncService, AuthGateService authGateService,
+            com.phenikaa.thesis.user.service.UserService userService) {
         this.userSyncService = userSyncService;
         this.authGateService = authGateService;
+        this.userService = userService;
     }
 
     // Check điều kiện "được vào hệ thống" (không auto-create user)
@@ -67,9 +70,18 @@ public class AuthController {
         info.put("email", claims.get("email"));
         info.put("name", claims.get("name"));
         info.put("local_user_id", localUser.getId());
-        info.put("local_roles", localUser.getRoles().stream()
-                .map(role -> role.getCode().name())
+
+        com.phenikaa.thesis.user.dto.UserResponse userDetails = userService.getById(localUser.getId());
+
+        info.put("local_roles", userDetails.getRoles().stream()
+                .map(Enum::name)
                 .collect(java.util.stream.Collectors.toList()));
+        info.put("facultyId", userDetails.getFacultyId());
+        info.put("facultyName", userDetails.getFacultyName());
+        info.put("majorId", userDetails.getMajorId());
+        info.put("majorName", userDetails.getMajorName());
+        info.put("managedMajorId", userDetails.getManagedMajorId());
+        info.put("managedMajorName", userDetails.getManagedMajorName());
         info.put("roles", auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(a -> a.startsWith("ROLE_"))

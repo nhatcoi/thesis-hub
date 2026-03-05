@@ -25,6 +25,9 @@ public class Lecturer extends BaseEntity {
     @JoinColumn(name = "faculty_id", nullable = false)
     private Faculty faculty;
 
+    @Column(name = "managed_major_code", length = 20)
+    private String managedMajorCode;
+
     @Column(name = "max_students_per_batch")
     private Integer maxStudentsPerBatch;
 }
