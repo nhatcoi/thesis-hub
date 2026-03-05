@@ -13,10 +13,17 @@ import com.phenikaa.thesis.organization.entity.AcademicYear;
 import com.phenikaa.thesis.organization.repository.AcademicYearRepository;
 import com.phenikaa.thesis.user.entity.User;
 import com.phenikaa.thesis.user.repository.UserRepository;
-import org.springframework.data.domain.Sort;
+import com.phenikaa.thesis.audit.annotation.Auditable;
+import com.phenikaa.thesis.notification.entity.enums.NotificationType;
+import com.phenikaa.thesis.notification.service.NotificationService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,19 +34,23 @@ public class ThesisBatchService {
     private final AcademicYearRepository academicYearRepo;
     private final UserRepository userRepo;
     private final CurrentUserService currentUserService;
+    private final NotificationService notificationService;
 
     public ThesisBatchService(ThesisBatchRepository batchRepo,
-                              AcademicYearRepository academicYearRepo,
-                              UserRepository userRepo,
-                              CurrentUserService currentUserService) {
+            AcademicYearRepository academicYearRepo,
+            UserRepository userRepo,
+            CurrentUserService currentUserService,
+            NotificationService notificationService) {
         this.batchRepo = batchRepo;
         this.academicYearRepo = academicYearRepo;
         this.userRepo = userRepo;
         this.currentUserService = currentUserService;
+        this.notificationService = notificationService;
     }
 
     // ── CREATE ────────────────────────────────────────────────────────────
     @Transactional
+    @Auditable(action = "CREATE_BATCH", entityType = "ThesisBatch")
     public ThesisBatchResponse createBatch(ThesisBatchCreateRequest req) {
         AcademicYear ay = findAcademicYear(req.academicYearId());
         validateDateRanges(req.topicRegStart(), req.topicRegEnd(),
@@ -80,25 +91,35 @@ public class ThesisBatchService {
 
     // ── READ (list) ───────────────────────────────────────────────────────
     @Transactional(readOnly = true)
-    public List<ThesisBatchResponse> listBatches(BatchStatus status) {
-        List<ThesisBatch> batches;
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+    public Page<ThesisBatchResponse> listBatches(String search, BatchStatus status, Pageable pageable) {
+        Specification<ThesisBatch> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
 
-        if (status != null) {
-            batches = batchRepo.findByStatus(status, sort);
-        } else {
-            batches = batchRepo.findAll(sort);
-        }
-        return batches.stream().map(this::toResponse).toList();
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
+
+            if (search != null && !search.isBlank()) {
+                String pattern = "%" + search.toLowerCase() + "%";
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("name")), pattern),
+                        cb.like(cb.lower(root.get("academicYear").get("name")), pattern)));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return batchRepo.findAll(spec, pageable).map(this::toResponse);
     }
 
     // ── UPDATE (only DRAFT batches) ───────────────────────────────────────
     @Transactional
+    @Auditable(action = "UPDATE_BATCH", entityType = "ThesisBatch")
     public ThesisBatchResponse updateBatch(UUID id, ThesisBatchUpdateRequest req) {
         ThesisBatch batch = findBatch(id);
 
         if (batch.getStatus() != BatchStatus.DRAFT) {
-            throw new BusinessException("Chỉ được sửa đợt đồ án ở trạng thái DRAFT");
+            throw new BusinessException("Chì được sửa đợt đồ án ở trạng thái DRAFT");
         }
 
         AcademicYear ay = findAcademicYear(req.academicYearId());
@@ -127,25 +148,35 @@ public class ThesisBatchService {
 
     // ── ACTIVATE (DRAFT → ACTIVE) ─────────────────────────────────────────
     @Transactional
+    @Auditable(action = "ACTIVATE_BATCH", entityType = "ThesisBatch")
     public ThesisBatchResponse activateBatch(UUID id) {
         ThesisBatch batch = findBatch(id);
 
         if (batch.getStatus() != BatchStatus.DRAFT) {
             throw new BusinessException(
-                    "Chỉ kích hoạt được đợt đồ án ở trạng thái DRAFT (hiện tại: " + batch.getStatus() + ")");
+                    "Chì kích hoạt được đợt đồ án ở trạng thái DRAFT (hiện tại: " + batch.getStatus() + ")");
         }
         batch.setStatus(BatchStatus.ACTIVE);
-        return toResponse(batchRepo.save(batch));
+        ThesisBatch saved = batchRepo.save(batch);
+
+        // Gửi thông báo cho tất cả
+        notificationService.sendNotification(saved.getCreatedBy(), NotificationType.BATCH_OPENED,
+                "Đợt đồ án mới đã mở",
+                "Đợt đồ án '" + saved.getName() + "' đã được kích hoạt. Sinh viên có thể bắt đầu đăng ký đề tài.",
+                "ThesisBatch", saved.getId());
+
+        return toResponse(saved);
     }
 
     // ── CLOSE (ACTIVE → CLOSED) ───────────────────────────────────────────
     @Transactional
+    @Auditable(action = "CLOSE_BATCH", entityType = "ThesisBatch")
     public ThesisBatchResponse closeBatch(UUID id) {
         ThesisBatch batch = findBatch(id);
 
         if (batch.getStatus() != BatchStatus.ACTIVE) {
             throw new BusinessException(
-                    "Chỉ đóng được đợt đồ án ở trạng thái ACTIVE (hiện tại: " + batch.getStatus() + ")");
+                    "Chì đóng được đợt đồ án ở trạng thái ACTIVE (hiện tại: " + batch.getStatus() + ")");
         }
         batch.setStatus(BatchStatus.CLOSED);
         return toResponse(batchRepo.save(batch));
@@ -153,11 +184,12 @@ public class ThesisBatchService {
 
     // ── DELETE (only DRAFT) ───────────────────────────────────────────────
     @Transactional
+    @Auditable(action = "DELETE_BATCH", entityType = "ThesisBatch")
     public void deleteBatch(UUID id) {
         ThesisBatch batch = findBatch(id);
 
         if (batch.getStatus() != BatchStatus.DRAFT) {
-            throw new BusinessException("Chỉ được xoá đợt đồ án ở trạng thái DRAFT");
+            throw new BusinessException("Chì được xoá đợt đồ án ở trạng thái DRAFT");
         }
         batchRepo.delete(batch);
     }
@@ -174,10 +206,10 @@ public class ThesisBatchService {
     }
 
     private void validateDateRanges(java.time.LocalDate topicRegStart, java.time.LocalDate topicRegEnd,
-                                    java.time.LocalDate outlineStart, java.time.LocalDate outlineEnd,
-                                    java.time.LocalDate implStart, java.time.LocalDate implEnd,
-                                    java.time.LocalDate defRegStart, java.time.LocalDate defRegEnd,
-                                    java.time.LocalDate defStart, java.time.LocalDate defEnd) {
+            java.time.LocalDate outlineStart, java.time.LocalDate outlineEnd,
+            java.time.LocalDate implStart, java.time.LocalDate implEnd,
+            java.time.LocalDate defRegStart, java.time.LocalDate defRegEnd,
+            java.time.LocalDate defStart, java.time.LocalDate defEnd) {
 
         assertBefore(topicRegStart, topicRegEnd, "Ngày bắt đầu ĐK đề tài phải trước ngày kết thúc");
         assertBefore(outlineStart, outlineEnd, "Ngày bắt đầu đề cương phải trước ngày kết thúc");
@@ -223,7 +255,6 @@ public class ThesisBatchService {
                 b.getDefenseStart(),
                 b.getDefenseEnd(),
                 b.getCreatedAt(),
-                b.getUpdatedAt()
-        );
+                b.getUpdatedAt());
     }
 }

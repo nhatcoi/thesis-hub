@@ -14,4 +14,6 @@ public interface LecturerRepository extends JpaRepository<Lecturer, UUID> {
     Optional<Lecturer> findByUserId(UUID userId);
 
     List<Lecturer> findByFacultyId(UUID facultyId);
+
+    long countByFacultyId(UUID facultyId);
 }

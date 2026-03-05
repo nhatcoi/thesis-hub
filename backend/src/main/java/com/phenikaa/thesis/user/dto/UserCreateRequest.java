@@ -7,8 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
-import java.math.BigDecimal;
-
 @Data
 @Builder
 public class UserCreateRequest {
@@ -30,18 +28,13 @@ public class UserCreateRequest {
     private String phone;
 
     @NotNull(message = "Vai trò không được để trống")
-    private UserRole role;
+    private java.util.Set<UserRole> roles;
 
     // Student specific fields
     private String majorCode;
     private String cohort;
-    private BigDecimal gpa;
-    private Integer accumulatedCredits;
 
     // Lecturer specific fields
     private String facultyCode;
-    private String academicRank;
-    private String academicDegree;
-    private String researchAreas;
     private Integer maxStudentsPerBatch;
 }

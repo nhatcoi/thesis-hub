@@ -102,8 +102,6 @@ CREATE TABLE students (
     student_code        VARCHAR(20) UNIQUE NOT NULL,
     major_id            UUID NOT NULL REFERENCES majors(id),
     cohort              VARCHAR(20) NOT NULL,
-    gpa                 NUMERIC(3,2),
-    accumulated_credits INT DEFAULT 0,
     eligible_for_thesis BOOLEAN DEFAULT FALSE,
     created_at          TIMESTAMPTZ DEFAULT NOW(),
     updated_at          TIMESTAMPTZ DEFAULT NOW()
@@ -114,9 +112,6 @@ CREATE TABLE lecturers (
     user_id                 UUID UNIQUE NOT NULL REFERENCES users(id),
     lecturer_code           VARCHAR(20) UNIQUE NOT NULL,
     faculty_id              UUID NOT NULL REFERENCES faculties(id),
-    academic_rank           VARCHAR(50),
-    academic_degree         VARCHAR(50),
-    research_areas          TEXT,
     max_students_per_batch  INT DEFAULT 5,
     created_at              TIMESTAMPTZ DEFAULT NOW(),
     updated_at              TIMESTAMPTZ DEFAULT NOW()
@@ -613,12 +608,12 @@ INSERT INTO users (username, email, first_name, last_name, role, status) VALUES
 ('sv001',       'sv001@st.phenikaa.edu.vn',     'Sinh viên',    'Nguyễn A',       'STUDENT',      'ACTIVE'),
 ('sv002',       'sv002@st.phenikaa.edu.vn',     'Sinh viên',    'Trần B',         'STUDENT',      'ACTIVE');
 
-INSERT INTO lecturers (user_id, lecturer_code, faculty_id, academic_rank, academic_degree, research_areas) VALUES
-((SELECT id FROM users WHERE username = 'gv_nhat'),  'GV001', (SELECT id FROM faculties WHERE code = 'HTTT'), 'Giảng viên', 'Thạc sĩ', 'Web, Software Engineering'),
-((SELECT id FROM users WHERE username = 'gv_viet'),  'GV002', (SELECT id FROM faculties WHERE code = 'HTTT'), 'Giảng viên', 'Thạc sĩ', 'AI, Machine Learning'),
-((SELECT id FROM users WHERE username = 'truongnganh'), 'GV000', (SELECT id FROM faculties WHERE code = 'HTTT'), 'Phó Giáo sư', 'Tiến sĩ', 'Software Architecture');
+INSERT INTO lecturers (user_id, lecturer_code, faculty_id) VALUES
+((SELECT id FROM users WHERE username = 'gv_nhat'),  'GV001', (SELECT id FROM faculties WHERE code = 'HTTT')),
+((SELECT id FROM users WHERE username = 'gv_viet'),  'GV002', (SELECT id FROM faculties WHERE code = 'HTTT')),
+((SELECT id FROM users WHERE username = 'truongnganh'), 'GV000', (SELECT id FROM faculties WHERE code = 'HTTT'));
 
-INSERT INTO students (user_id, student_code, major_id, cohort, gpa, accumulated_credits, eligible_for_thesis) VALUES
-((SELECT id FROM users WHERE username = 'sv001'), '23010887', (SELECT id FROM majors WHERE code = 'KTPM'), 'K17', 3.20, 132, TRUE),
-((SELECT id FROM users WHERE username = 'sv002'), '23010636', (SELECT id FROM majors WHERE code = 'KTPM'), 'K17', 2.85, 130, TRUE);
+INSERT INTO students (user_id, student_code, major_id, cohort, eligible_for_thesis) VALUES
+((SELECT id FROM users WHERE username = 'sv001'), '23010887', (SELECT id FROM majors WHERE code = 'KTPM'), 'K17', TRUE),
+((SELECT id FROM users WHERE username = 'sv002'), '23010636', (SELECT id FROM majors WHERE code = 'KTPM'), 'K17', TRUE);
 

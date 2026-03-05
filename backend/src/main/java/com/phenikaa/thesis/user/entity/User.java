@@ -1,14 +1,12 @@
 package com.phenikaa.thesis.user.entity;
 
 import com.phenikaa.thesis.common.entity.BaseEntity;
-import com.phenikaa.thesis.user.entity.enums.UserRole;
 import com.phenikaa.thesis.user.entity.enums.UserStatus;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import lombok.*;
-
 
 import java.time.OffsetDateTime;
 
@@ -39,10 +37,10 @@ public class User extends BaseEntity {
     @Column(name = "last_name", length = 80, nullable = false)
     private String lastName;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "user_role")
-    @JdbcType(PostgreSQLEnumJdbcType.class)
-    private UserRole role;
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private java.util.Set<Role> roles = new java.util.HashSet<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "user_status")
@@ -51,4 +49,10 @@ public class User extends BaseEntity {
 
     @Column(name = "last_login_at")
     private OffsetDateTime lastLoginAt;
+
+    @OneToOne(mappedBy = "user")
+    private Student student;
+
+    @OneToOne(mappedBy = "user")
+    private Lecturer lecturer;
 }

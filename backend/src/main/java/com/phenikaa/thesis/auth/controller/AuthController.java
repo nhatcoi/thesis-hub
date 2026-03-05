@@ -67,7 +67,9 @@ public class AuthController {
         info.put("email", claims.get("email"));
         info.put("name", claims.get("name"));
         info.put("local_user_id", localUser.getId());
-        info.put("local_role", localUser.getRole());
+        info.put("local_roles", localUser.getRoles().stream()
+                .map(role -> role.getCode().name())
+                .collect(java.util.stream.Collectors.toList()));
         info.put("roles", auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(a -> a.startsWith("ROLE_"))

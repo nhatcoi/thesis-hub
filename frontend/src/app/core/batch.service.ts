@@ -30,6 +30,8 @@ export interface ThesisBatch {
     updatedAt: string;
 }
 
+export type Batch = ThesisBatch;
+
 export interface ThesisBatchCreateRequest {
     name: string;
     academicYearId: string;
@@ -60,6 +62,14 @@ interface ApiResponse<T> {
     timestamp: string;
 }
 
+export interface PageResponse<T> {
+    content: T[];
+    totalElements: number;
+    totalPages: number;
+    size: number;
+    number: number;
+}
+
 /* ── Service ─────────────────────────────────────────────── */
 
 @Injectable({ providedIn: 'root' })
@@ -74,10 +84,23 @@ export class BatchService {
     }
 
     /* ── Batch CRUD ── */
-    listBatches(status?: BatchStatus): Observable<ThesisBatch[]> {
-        let params = new HttpParams();
-        if (status) params = params.set('status', status);
-        return this.http.get<ApiResponse<ThesisBatch[]>>(this.baseUrl, { params }).pipe(map(r => r.data));
+    listBatches(params?: {
+        search?: string;
+        status?: BatchStatus | null;
+        page?: number;
+        size?: number;
+        sort?: string;
+    }): Observable<PageResponse<ThesisBatch>> {
+        let httpParams = new HttpParams();
+        if (params) {
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '') {
+                    httpParams = httpParams.set(key, value.toString());
+                }
+            });
+        }
+        return this.http.get<ApiResponse<PageResponse<ThesisBatch>>>(this.baseUrl, { params: httpParams })
+            .pipe(map(r => r.data));
     }
 
     getBatch(id: string): Observable<ThesisBatch> {

@@ -25,15 +25,6 @@ public class Lecturer extends BaseEntity {
     @JoinColumn(name = "faculty_id", nullable = false)
     private Faculty faculty;
 
-    @Column(name = "academic_rank", length = 50)
-    private String academicRank;
-
-    @Column(name = "academic_degree", length = 50)
-    private String academicDegree;
-
-    @Column(name = "research_areas", columnDefinition = "TEXT")
-    private String researchAreas;
-
     @Column(name = "max_students_per_batch")
     private Integer maxStudentsPerBatch;
 }

@@ -8,7 +8,7 @@ import lombok.Data;
 @JsonPropertyOrder({
         "username", "external_id", "email", "first_name", "last_name",
         "role", "school_code", "faculty_code", "major_code",
-        "cohort", "gpa", "accumulated_credits"
+        "cohort"
 })
 public class StudentImportRow {
     private String username;
@@ -36,9 +36,4 @@ public class StudentImportRow {
     private String majorCode;
 
     private String cohort;
-
-    private Double gpa;
-
-    @JsonProperty("accumulated_credits")
-    private Integer accumulatedCredits;
 }

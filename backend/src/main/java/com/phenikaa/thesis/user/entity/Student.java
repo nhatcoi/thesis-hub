@@ -5,8 +5,6 @@ import com.phenikaa.thesis.organization.entity.Major;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-
 @Entity
 @Table(name = "students")
 @Getter
@@ -29,12 +27,6 @@ public class Student extends BaseEntity {
 
     @Column(length = 20, nullable = false)
     private String cohort;
-
-    @Column(precision = 3, scale = 2)
-    private BigDecimal gpa;
-
-    @Column(name = "accumulated_credits")
-    private Integer accumulatedCredits;
 
     @Column(name = "eligible_for_thesis")
     private Boolean eligibleForThesis;

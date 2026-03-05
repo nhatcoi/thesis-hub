@@ -7,6 +7,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.phenikaa.thesis.user.dto.importing.ImportResult;
 import com.phenikaa.thesis.user.dto.importing.LecturerImportRow;
 import com.phenikaa.thesis.user.dto.importing.StudentImportRow;
+import com.phenikaa.thesis.audit.annotation.Auditable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -32,6 +33,7 @@ public class UserImportService {
         }
     };
 
+    @Auditable(action = "IMPORT_STUDENTS", entityType = "User")
     public ImportResult importStudents(MultipartFile file) {
         List<ImportResult.RowError> errors = new ArrayList<>();
         int successCount = 0;
@@ -70,6 +72,7 @@ public class UserImportService {
                 .build();
     }
 
+    @Auditable(action = "IMPORT_LECTURERS", entityType = "User")
     public ImportResult importLecturers(MultipartFile file) {
         List<ImportResult.RowError> errors = new ArrayList<>();
         int successCount = 0;
@@ -108,15 +111,9 @@ public class UserImportService {
                 .build();
     }
 
-    /**
-     * Phiên dịch lỗi kỹ thuật sang thông báo tiếng Việt dễ hiểu.
-     */
     private String translateError(Exception ex) {
         String raw = getRootMessage(ex);
-
-        // 1. Duplicate key (trùng dữ liệu)
         if (ex instanceof DataIntegrityViolationException || raw.contains("duplicate key")) {
-            // Trích xuất tên constraint và giá trị trùng
             Pattern keyPattern = Pattern.compile("Key \\(([^)]+)\\)=\\(([^)]+)\\)");
             Matcher m = keyPattern.matcher(raw);
             if (m.find()) {
@@ -126,8 +123,6 @@ public class UserImportService {
             }
             return "Trùng lặp dữ liệu - bản ghi đã tồn tại";
         }
-
-        // 2. Not-null violation (thiếu dữ liệu bắt buộc)
         if (raw.contains("not-null constraint") || raw.contains("null value in column")) {
             Pattern colPattern = Pattern.compile("column \"([^\"]+)\"");
             Matcher m = colPattern.matcher(raw);
@@ -137,23 +132,15 @@ public class UserImportService {
             }
             return "Thiếu dữ liệu bắt buộc cho một trường quan trọng";
         }
-
-        // 3. Foreign key violation (tham chiếu không hợp lệ)
         if (raw.contains("foreign key") || raw.contains("is not present in table")) {
             return "Dữ liệu tham chiếu không hợp lệ (mã khoa/ngành không tồn tại)";
         }
-
-        // 4. Data type error (sai kiểu dữ liệu)
         if (raw.contains("NumberFormatException") || raw.contains("Cannot deserialize")) {
             return "Sai định dạng dữ liệu số (GPA hoặc số tín chỉ)";
         }
-
-        // 5. Custom messages (đã throw RuntimeException với message tiếng Việt)
         if (raw.startsWith("Không tìm thấy")) {
             return raw;
         }
-
-        // 6. CSV parse errors
         if (raw.contains("Unrecognized field")) {
             Pattern fieldPattern = Pattern.compile("Unrecognized field \"([^\"]+)\"");
             Matcher m = fieldPattern.matcher(raw);
@@ -162,17 +149,12 @@ public class UserImportService {
             }
             return "File CSV có cột không hợp lệ";
         }
-
-        // Fallback: rút gọn message cho dễ đọc
         if (raw.length() > 120) {
             return raw.substring(0, 120) + "...";
         }
         return raw;
     }
 
-    /**
-     * Dịch tên cột DB sang tiếng Việt.
-     */
     private String translateColumn(String column) {
         return switch (column) {
             case "username" -> "Tên đăng nhập";
@@ -194,9 +176,6 @@ public class UserImportService {
         };
     }
 
-    /**
-     * Lấy message gốc từ chuỗi exception lồng nhau.
-     */
     private String getRootMessage(Throwable ex) {
         Throwable cause = ex;
         while (cause.getCause() != null && cause.getCause() != cause) {

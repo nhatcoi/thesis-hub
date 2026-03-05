@@ -31,11 +31,12 @@ GIAI ĐOẠN 1: ĐĂNG KÝ ĐỀ TÀI & THỰC HIỆN ĐỒ ÁN
 │  │  ├─ Lưu dữ liệu sinh viên (khoa/ngành, GPA, tín chỉ tích lũy,…)
 │  │  ├─ Kiểm tra điều kiện làm đồ án (GPA, tín chỉ, nợ môn bắt buộc…)
 │  │  ├─ Gán trạng thái:
-│  │  │  ├─ `ELIGIBLE_FOR_THESIS` nếu đủ điều kiện
+│  │  │  ├─ `ELIGIBLE_FOR_THESIS` nếu đủ điều kiện (ứng viên làm đồ án)
 │  │  │  └─ `NOT_ELIGIBLE` nếu không đủ điều kiện
 │  │  └─ Chặn sinh viên `NOT_ELIGIBLE` khỏi luồng đăng ký đề tài (không cho đi tiếp giai đoạn 1)
 │  └─ Nghiệp vụ Trưởng ngành
-│     └─ Xem danh sách sinh viên thuộc **ngành mình quản lý** ở trạng thái `ELIGIBLE_FOR_THESIS`
+│     ├─ Xem danh sách sinh viên thuộc **ngành mình quản lý** ở trạng thái `ELIGIBLE_FOR_THESIS`
+│     └─ Chọn / duyệt danh sách sinh viên chính thức tham gia từng **đợt đồ án** (có thể loại bớt, khóa tham gia)
 
 ├─ 3. Giảng viên đăng ký đề tài
 │  ├─ Actor: Giảng viên, Hệ thống

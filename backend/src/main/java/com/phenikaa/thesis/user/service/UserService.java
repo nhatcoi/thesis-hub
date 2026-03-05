@@ -6,17 +6,32 @@ import com.phenikaa.thesis.organization.entity.Major;
 import com.phenikaa.thesis.organization.repository.FacultyRepository;
 import com.phenikaa.thesis.organization.repository.MajorRepository;
 import com.phenikaa.thesis.user.dto.UserCreateRequest;
+import com.phenikaa.thesis.user.dto.UserResponse;
 import com.phenikaa.thesis.user.entity.Lecturer;
+import com.phenikaa.thesis.user.entity.Role;
 import com.phenikaa.thesis.user.entity.Student;
 import com.phenikaa.thesis.user.entity.User;
 import com.phenikaa.thesis.user.entity.enums.UserRole;
 import com.phenikaa.thesis.user.entity.enums.UserStatus;
 import com.phenikaa.thesis.user.repository.LecturerRepository;
+import com.phenikaa.thesis.user.repository.RoleRepository;
 import com.phenikaa.thesis.user.repository.StudentRepository;
 import com.phenikaa.thesis.user.repository.UserRepository;
+import com.phenikaa.thesis.audit.annotation.Auditable;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,12 +42,102 @@ public class UserService {
     private final LecturerRepository lecturerRepository;
     private final MajorRepository majorRepository;
     private final FacultyRepository facultyRepository;
+    private final RoleRepository roleRepository;
 
-    public java.util.List<User> getAllUsers() {
-        return userRepository.findAll();
+    @Transactional(readOnly = true)
+    public Page<UserResponse> getUsers(String search, UserRole role, UUID facultyId, UUID majorId, Pageable pageable) {
+        Specification<User> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (search != null && !search.isBlank()) {
+                String searchPattern = "%" + search.toLowerCase() + "%";
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("username")), searchPattern),
+                        cb.like(cb.lower(root.get("email")), searchPattern),
+                        cb.like(cb.lower(root.get("firstName")), searchPattern),
+                        cb.like(cb.lower(root.get("lastName")), searchPattern)));
+            }
+
+            if (role != null) {
+                Join<User, Role> roleJoin = root.join("roles");
+                predicates.add(cb.equal(roleJoin.get("code"), role));
+            }
+
+            if (facultyId != null) {
+                // Check in Student or Lecturer
+                Join<User, Student> studentJoin = root.join("student", jakarta.persistence.criteria.JoinType.LEFT);
+                Join<User, Lecturer> lecturerJoin = root.join("lecturer", jakarta.persistence.criteria.JoinType.LEFT);
+                predicates.add(cb.or(
+                        cb.equal(studentJoin.get("major").get("faculty").get("id"), facultyId),
+                        cb.equal(lecturerJoin.get("faculty").get("id"), facultyId)));
+            }
+
+            if (majorId != null) {
+                Join<User, Student> studentJoin = root.join("student", jakarta.persistence.criteria.JoinType.LEFT);
+                predicates.add(cb.equal(studentJoin.get("major").get("id"), majorId));
+            }
+
+            if (query.getResultType() != Long.class && query.getResultType() != long.class) {
+                root.fetch("roles", jakarta.persistence.criteria.JoinType.LEFT);
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return userRepository.findAll(spec, pageable).map(this::mapToResponse);
+    }
+
+    private UserResponse mapToResponse(User user) {
+        String facultyName = null;
+        String majorName = null;
+        UUID userFacultyId = null;
+        UUID userMajorId = null;
+
+        Set<UserRole> roleCodes = user.getRoles().stream()
+                .map(Role::getCode)
+                .collect(Collectors.toSet());
+
+        if (roleCodes.contains(UserRole.STUDENT)) {
+            Student student = studentRepository.findByUserId(user.getId()).orElse(null);
+            if (student != null && student.getMajor() != null) {
+                majorName = student.getMajor().getName();
+                userMajorId = student.getMajor().getId();
+                if (student.getMajor().getFaculty() != null) {
+                    facultyName = student.getMajor().getFaculty().getName();
+                    userFacultyId = student.getMajor().getFaculty().getId();
+                }
+            }
+        }
+
+        // Multi-role logic: search for profile if has lecturer or head role
+        if (roleCodes.contains(UserRole.LECTURER) || roleCodes.contains(UserRole.DEPT_HEAD)) {
+            Lecturer lecturer = lecturerRepository.findByUserId(user.getId()).orElse(null);
+            if (lecturer != null) {
+                if (lecturer.getFaculty() != null) {
+                    facultyName = lecturer.getFaculty().getName();
+                    userFacultyId = lecturer.getFaculty().getId();
+                }
+            }
+        }
+
+        return UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phone(user.getPhone())
+                .roles(roleCodes != null ? roleCodes : new java.util.HashSet<>())
+                .status(user.getStatus())
+                .facultyName(facultyName)
+                .majorName(majorName)
+                .facultyId(userFacultyId)
+                .majorId(userMajorId)
+                .build();
     }
 
     @Transactional
+    @Auditable(action = "CREATE_USER", entityType = "User")
     public User createUser(UserCreateRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new BusinessException("Tên đăng nhập đã tồn tại: " + request.getUsername());
@@ -41,6 +146,11 @@ public class UserService {
             throw new BusinessException("Email đã tồn tại: " + request.getEmail());
         }
 
+        Set<Role> roles = request.getRoles().stream()
+                .map(roleCode -> roleRepository.findByCode(roleCode)
+                        .orElseThrow(() -> new BusinessException("Không tìm thấy vai trò: " + roleCode)))
+                .collect(Collectors.toSet());
+
         User user = User.builder()
                 .username(request.getUsername())
                 .externalId(request.getExternalId())
@@ -48,16 +158,18 @@ public class UserService {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .phone(request.getPhone())
-                .role(request.getRole())
+                .roles(roles)
                 .status(UserStatus.ACTIVE)
                 .build();
 
         user = userRepository.save(user);
 
-        // Handle profile based on role
-        if (request.getRole() == UserRole.STUDENT) {
+        // Handle profile based on roles
+        Set<UserRole> roleCodes = request.getRoles();
+        if (roleCodes.contains(UserRole.STUDENT)) {
             createStudentProfile(user, request);
-        } else if (request.getRole() == UserRole.LECTURER || request.getRole() == UserRole.DEPT_HEAD) {
+        }
+        if (roleCodes.contains(UserRole.LECTURER) || roleCodes.contains(UserRole.DEPT_HEAD)) {
             createLecturerProfile(user, request);
         }
 
@@ -76,16 +188,8 @@ public class UserService {
                 .studentCode(user.getUsername())
                 .major(major)
                 .cohort(request.getCohort() != null ? request.getCohort() : "N/A")
-                .gpa(request.getGpa())
-                .accumulatedCredits(request.getAccumulatedCredits() != null ? request.getAccumulatedCredits() : 0)
-                .eligibleForThesis(false) // Default, will be recalculated if needed
+                .eligibleForThesis(Boolean.TRUE)
                 .build();
-
-        // Simple eligibility check
-        if (student.getAccumulatedCredits() >= major.getRequiredCredits() &&
-                student.getGpa() != null && student.getGpa().compareTo(major.getMinGpaForThesis()) >= 0) {
-            student.setEligibleForThesis(true);
-        }
 
         studentRepository.save(student);
     }
@@ -101,9 +205,6 @@ public class UserService {
                 .user(user)
                 .lecturerCode(user.getUsername())
                 .faculty(faculty)
-                .academicRank(request.getAcademicRank())
-                .academicDegree(request.getAcademicDegree())
-                .researchAreas(request.getResearchAreas())
                 .maxStudentsPerBatch(request.getMaxStudentsPerBatch() != null ? request.getMaxStudentsPerBatch() : 5)
                 .build();
 

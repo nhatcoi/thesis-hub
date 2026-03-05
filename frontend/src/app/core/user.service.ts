@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -12,20 +12,38 @@ export interface UserCreateRequest {
     firstName: string;
     lastName: string;
     phone?: string;
-    role: UserRole;
+    roles: UserRole[];
 
     // Student specific
     majorCode?: string;
     cohort?: string;
-    gpa?: number;
-    accumulatedCredits?: number;
 
     // Lecturer specific
     facultyCode?: string;
-    academicRank?: string;
-    academicDegree?: string;
-    researchAreas?: string;
     maxStudentsPerBatch?: number;
+}
+
+export interface UserResponse {
+    id: string;
+    username: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phone?: string;
+    roles: UserRole[];
+    status: string;
+    facultyName?: string;
+    majorName?: string;
+    facultyId?: string;
+    majorId?: string;
+}
+
+export interface PageResponse<T> {
+    content: T[];
+    totalElements: number;
+    totalPages: number;
+    size: number;
+    number: number;
 }
 
 interface ApiResponse<T> {
@@ -43,8 +61,26 @@ export class UserService {
         return this.http.post<ApiResponse<any>>(this.baseUrl, req);
     }
 
-    getAll(): Observable<any[]> {
-        return this.http.get<ApiResponse<any[]>>(this.baseUrl).pipe(map(r => r.data));
+    getAll(params: {
+        page?: number;
+        size?: number;
+        search?: string;
+        role?: string;
+        facultyId?: string;
+        majorId?: string;
+        sort?: string;
+    }): Observable<PageResponse<any>> {
+        let httpParams = new HttpParams();
+        if (params.page !== undefined) httpParams = httpParams.set('page', params.page);
+        if (params.size !== undefined) httpParams = httpParams.set('size', params.size);
+        if (params.search) httpParams = httpParams.set('search', params.search);
+        if (params.role) httpParams = httpParams.set('role', params.role);
+        if (params.facultyId) httpParams = httpParams.set('facultyId', params.facultyId);
+        if (params.majorId) httpParams = httpParams.set('majorId', params.majorId);
+        if (params.sort) httpParams = httpParams.set('sort', params.sort);
+
+        return this.http.get<ApiResponse<PageResponse<any>>>(this.baseUrl, { params: httpParams })
+            .pipe(map(r => r.data));
     }
 
     // Helper for faculty/major selection

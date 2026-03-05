@@ -9,11 +9,17 @@ import java.util.UUID;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student, UUID> {
-    Optional<Student> findByStudentCode(String studentCode);
+        Optional<Student> findByStudentCode(String studentCode);
 
-    Optional<Student> findByUserId(UUID userId);
+        Optional<Student> findByUserId(UUID userId);
 
-    List<Student> findByMajorId(UUID majorId);
+        List<Student> findByMajorId(UUID majorId);
 
-    List<Student> findByEligibleForThesisTrue();
+        List<Student> findByEligibleForThesisTrue();
+
+        long countByEligibleForThesis(boolean eligible);
+
+        long countByMajorId(UUID majorId);
+
+        long countByMajorIdAndEligibleForThesis(UUID majorId, boolean eligible);
 }

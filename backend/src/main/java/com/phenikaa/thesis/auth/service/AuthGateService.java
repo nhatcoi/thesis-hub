@@ -2,7 +2,6 @@ package com.phenikaa.thesis.auth.service;
 
 import com.phenikaa.thesis.auth.dto.AuthCheckResponse;
 import com.phenikaa.thesis.user.entity.User;
-import com.phenikaa.thesis.user.entity.enums.UserRole;
 import com.phenikaa.thesis.user.entity.enums.UserStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,41 +19,44 @@ public class AuthGateService {
             return AuthCheckResponse.deny(
                     "USER_NOT_IN_SYSTEM",
                     "Tài khoản không có trong hệ thống ĐATN",
-                    tokenRoles
-            );
+                    tokenRoles);
         }
 
         if (localUser.getStatus() != UserStatus.ACTIVE) {
             return AuthCheckResponse.deny(
                     "USER_NOT_ACTIVE",
                     "Tài khoản đang bị khóa/không hoạt động",
-                    tokenRoles
-            );
+                    tokenRoles);
         }
 
-        UserRole localRole = localUser.getRole();
-        if (localRole == null) {
+        if (localUser.getRoles() == null || localUser.getRoles().isEmpty()) {
             return AuthCheckResponse.deny(
                     "LOCAL_ROLE_MISSING",
                     "Tài khoản chưa được gán vai trò trong hệ thống",
-                    tokenRoles
-            );
+                    tokenRoles);
         }
 
-        // Token phải chứa role tương ứng của user local
-        if (!tokenRoles.contains(localRole.name())) {
+        List<String> localRoleNames = localUser.getRoles().stream()
+                .map(role -> role.getCode().name())
+                .toList();
+
+        // Check if any local role is in token roles
+        boolean hasMatch = localRoleNames.stream().anyMatch(tokenRoles::contains);
+        if (!hasMatch) {
             return AuthCheckResponse.deny(
                     "ROLE_MISMATCH",
                     "Vai trò SSO không khớp với vai trò trong hệ thống",
-                    tokenRoles
-            );
+                    tokenRoles);
         }
 
-        return AuthCheckResponse.allow(localUser.getId(), localRole.name(), tokenRoles);
+        // Return the first matching role as primary, or just join them
+        String primaryRole = localRoleNames.get(0);
+        return AuthCheckResponse.allow(localUser.getId(), primaryRole, tokenRoles);
     }
 
     private List<String> extractTokenRoles(Authentication auth) {
-        if (auth == null) return List.of();
+        if (auth == null)
+            return List.of();
         return auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(a -> a.startsWith("ROLE_"))
@@ -64,4 +66,3 @@ public class AuthGateService {
                 .toList();
     }
 }
-

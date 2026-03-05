@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService, Role } from '../core/auth.service';
+import { NotificationService } from '../core/notification.service';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 
@@ -16,17 +17,21 @@ const MENU_MAP: Record<string, MenuItem[]> = {
     { path: '/pdt/users', label: 'Quản lý người dùng', icon: 'people', exact: false },
     { path: '/pdt/batches', label: 'Quản lý đợt đồ án', icon: 'date_range', exact: false },
     { path: '/pdt/academic-years', label: 'Quản lý niên khóa', icon: 'calendar_today', exact: false },
-    { path: '/pdt/import', label: 'Import dữ liệu', icon: 'group_add', exact: false },
+    { path: '/pdt/notifications', label: 'Thông báo', icon: 'notifications', exact: false },
+    { path: '/pdt/history', label: 'Lịch sử hệ thống', icon: 'history', exact: false },
   ],
   TRAINING_DEPT: [
     { path: '/pdt/users', label: 'Quản lý người dùng', icon: 'people', exact: false },
     { path: '/pdt/batches', label: 'Quản lý đợt đồ án', icon: 'date_range', exact: false },
     { path: '/pdt/academic-years', label: 'Quản lý niên khóa', icon: 'calendar_today', exact: false },
-    { path: '/pdt/import', label: 'Import dữ liệu', icon: 'group_add', exact: false },
+    { path: '/pdt/notifications', label: 'Thông báo', icon: 'notifications', exact: false },
+    { path: '/pdt/history', label: 'Lịch sử hệ thống', icon: 'history', exact: false },
   ],
   DEPT_HEAD: [
     { path: '/head/students', label: 'DS Sinh viên', icon: 'people', exact: false },
     { path: '/head/topics', label: 'Đề tài đề xuất', icon: 'assignment', exact: false },
+    { path: '/head/notifications', label: 'Thông báo', icon: 'notifications', exact: false },
+    { path: '/head/history', label: 'Lịch sử của tôi', icon: 'history', exact: false },
   ],
   LECTURER: [
     { path: '/lecturer/topics', label: 'Đề tài của tôi', icon: 'library_books', exact: false },
@@ -34,6 +39,8 @@ const MENU_MAP: Record<string, MenuItem[]> = {
     { path: '/lecturer/outlines', label: 'Duyệt đề cương', icon: 'description', exact: false },
     { path: '/lecturer/progress', label: 'Theo dõi tiến độ', icon: 'trending_up', exact: false },
     { path: '/lecturer/defenses', label: 'Duyệt bảo vệ', icon: 'gavel', exact: false },
+    { path: '/lecturer/notifications', label: 'Thông báo', icon: 'notifications', exact: false },
+    { path: '/lecturer/history', label: 'Lịch sử của tôi', icon: 'history', exact: false },
   ],
   STUDENT: [
     { path: '/student/topics', label: 'Đăng ký đề tài', icon: 'search', exact: false },
@@ -41,6 +48,7 @@ const MENU_MAP: Record<string, MenuItem[]> = {
     { path: '/student/progress', label: 'Cập nhật tiến độ', icon: 'update', exact: false },
     { path: '/student/defense', label: 'Đăng ký bảo vệ', icon: 'school', exact: false },
     { path: '/student/notifications', label: 'Thông báo', icon: 'notifications', exact: false },
+    { path: '/student/history', label: 'Lịch sử của tôi', icon: 'history', exact: false },
   ],
 };
 
@@ -91,9 +99,13 @@ const MENU_MAP: Record<string, MenuItem[]> = {
           <h1 class="text-xl font-semibold text-gray-900">Hệ thống Quản lý Đồ án</h1>
           
           <div class="flex items-center space-x-4">
-            <button class="p-2 text-gray-400 hover:text-gray-500 relative">
+            <button (click)="goToNotifications()" class="p-2 text-gray-400 hover:text-gray-500 relative group">
               <mat-icon>notifications</mat-icon>
-              <span class="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white"></span>
+              @if (notificationService.unreadCount() > 0) {
+                <span class="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
+                  {{ notificationService.unreadCount() > 99 ? '99+' : notificationService.unreadCount() }}
+                </span>
+              }
             </button>
             
             @if (auth.currentUser(); as user) {
@@ -118,11 +130,18 @@ const MENU_MAP: Record<string, MenuItem[]> = {
         </main>
       </div>
     </div>
-  `
+  `,
 })
-export class LayoutComponent {
+export class LayoutComponent implements OnInit {
   auth = inject(AuthService);
+  notificationService = inject(NotificationService);
   private router = inject(Router);
+
+  ngOnInit(): void {
+    if (this.auth.isLoggedIn()) {
+      this.notificationService.loadUnreadCount();
+    }
+  }
 
   menuItems(): MenuItem[] {
     const role = this.auth.currentUser()?.activeRole;
@@ -145,6 +164,12 @@ export class LayoutComponent {
     const select = event.target as HTMLSelectElement;
     this.auth.setActiveRole(select.value as Role);
     this.router.navigate(['/dashboard']);
+  }
+
+  goToNotifications(): void {
+    const role = this.auth.currentUser()?.activeRole?.toLowerCase();
+    const prefix = role === 'admin' || role === 'training_dept' ? 'pdt' : role;
+    this.router.navigate([`/${prefix}/notifications`]);
   }
 
   logout(): void {

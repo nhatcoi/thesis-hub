@@ -6,6 +6,7 @@ import com.phenikaa.thesis.organization.dto.AcademicYearRequest;
 import com.phenikaa.thesis.organization.entity.AcademicYear;
 import com.phenikaa.thesis.organization.repository.AcademicYearRepository;
 import com.phenikaa.thesis.batch.repository.ThesisBatchRepository;
+import com.phenikaa.thesis.audit.annotation.Auditable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ public class AcademicYearService {
     }
 
     @Transactional
+    @Auditable(action = "CREATE_ACADEMIC_YEAR", entityType = "AcademicYear")
     public AcademicYear create(AcademicYearRequest req) {
         validateDates(req.startDate(), req.endDate());
 
@@ -49,6 +51,7 @@ public class AcademicYearService {
     }
 
     @Transactional
+    @Auditable(action = "UPDATE_ACADEMIC_YEAR", entityType = "AcademicYear")
     public AcademicYear update(UUID id, AcademicYearRequest req) {
         AcademicYear ay = getById(id);
         validateDates(req.startDate(), req.endDate());
@@ -61,6 +64,7 @@ public class AcademicYearService {
     }
 
     @Transactional
+    @Auditable(action = "DELETE_ACADEMIC_YEAR", entityType = "AcademicYear")
     public void delete(UUID id) {
         AcademicYear ay = getById(id);
 

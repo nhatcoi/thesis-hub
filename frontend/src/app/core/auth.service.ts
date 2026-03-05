@@ -16,6 +16,10 @@ export interface User {
   roles: Role[];
   activeRole: Role;
   localRole?: Role;
+  facultyName?: string;
+  majorName?: string;
+  facultyId?: string;
+  majorId?: string;
 }
 
 export interface AuthCheckResult {
@@ -107,13 +111,12 @@ export class AuthService {
           // Lấy thông tin user + roles từ backend
           const meRes = await firstValueFrom(this.http.get<any>(`${environment.apiUrl}/auth/me`));
           const me = meRes.data;
-          const backendRoles = (me.roles || []) as Role[];
-          const backendLocalRole = me.local_role as Role;
+          const backendRoles = (me.local_roles || []) as Role[];
 
           const savedRole = sessionStorage.getItem('activeRole') as Role;
           const activeRole: Role = (savedRole && backendRoles.includes(savedRole))
             ? savedRole
-            : (backendRoles[0] || backendLocalRole || 'STUDENT');
+            : (backendRoles[0] || 'STUDENT');
 
           const current = this.currentUser();
           if (current) {
@@ -121,8 +124,11 @@ export class AuthService {
               ...current,
               id: me.local_user_id,
               roles: backendRoles,
-              localRole: backendLocalRole,
-              activeRole
+              activeRole,
+              facultyName: me.facultyName,
+              majorName: me.majorName,
+              facultyId: me.facultyId,
+              majorId: me.majorId
             });
           }
 

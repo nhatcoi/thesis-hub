@@ -62,12 +62,12 @@ CREATE TABLE academic_years (
 --    RBAC: ADMIN, TRAINING_DEPT, DEPT_HEAD, LECTURER, STUDENT
 -- ============================================================
 
-CREATE TYPE user_role AS ENUM (
-    'ADMIN',
-    'TRAINING_DEPT',
-    'DEPT_HEAD',
-    'LECTURER',
-    'STUDENT'
+CREATE TABLE roles (
+    id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    code            VARCHAR(50) UNIQUE NOT NULL,
+    name            VARCHAR(100) NOT NULL,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TYPE user_status AS ENUM (
@@ -78,19 +78,22 @@ CREATE TYPE user_status AS ENUM (
 
 CREATE TABLE users (
     id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    -- mã cán bộ/mã sinh viên
     username        VARCHAR(50) UNIQUE NOT NULL,
-    -- subject / external id từ hệ thống SSO của trường
     external_id     VARCHAR(100) UNIQUE,
     email           VARCHAR(150) UNIQUE NOT NULL,
     phone           VARCHAR(20),
     first_name      VARCHAR(80) NOT NULL,
     last_name       VARCHAR(80) NOT NULL,
-    role            user_role NOT NULL,
     status          user_status NOT NULL DEFAULT 'ACTIVE',
     last_login_at   TIMESTAMPTZ,
     created_at      TIMESTAMPTZ DEFAULT NOW(),
     updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE user_roles (
+    user_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    role_id         UUID NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, role_id)
 );
 
 CREATE TABLE students (
@@ -99,8 +102,6 @@ CREATE TABLE students (
     student_code        VARCHAR(20) UNIQUE NOT NULL,
     major_id            UUID NOT NULL REFERENCES majors(id),
     cohort              VARCHAR(20) NOT NULL,
-    gpa                 NUMERIC(3,2),
-    accumulated_credits INT DEFAULT 0,
     eligible_for_thesis BOOLEAN DEFAULT FALSE,
     created_at          TIMESTAMPTZ DEFAULT NOW(),
     updated_at          TIMESTAMPTZ DEFAULT NOW()
@@ -111,9 +112,6 @@ CREATE TABLE lecturers (
     user_id                 UUID UNIQUE NOT NULL REFERENCES users(id),
     lecturer_code           VARCHAR(20) UNIQUE NOT NULL,
     faculty_id              UUID NOT NULL REFERENCES faculties(id),
-    academic_rank           VARCHAR(50),
-    academic_degree         VARCHAR(50),
-    research_areas          TEXT,
     max_students_per_batch  INT DEFAULT 5,
     created_at              TIMESTAMPTZ DEFAULT NOW(),
     updated_at              TIMESTAMPTZ DEFAULT NOW()
@@ -600,22 +598,42 @@ INSERT INTO rooms (code, name, capacity, building) VALUES
 ('B201', 'Phòng B201', 30, 'Tòa B'),
 ('B202', 'Phòng B202', 30, 'Tòa B');
 
+-- Seed roles
+INSERT INTO roles (code, name) VALUES
+('ADMIN', 'Quản trị hệ thống'),
+('TRAINING_DEPT', 'Phòng Đào tạo'),
+('DEPT_HEAD', 'Trưởng bộ môn / Ngành'),
+('LECTURER', 'Giảng viên'),
+('STUDENT', 'Sinh viên');
+
 -- Seed users (SSO: external_id tạm để null, sẽ map sau)
-INSERT INTO users (username, email, full_name, role, status) VALUES
-('admin',       'admin@phenikaa.edu.vn',        'System Admin',         'ADMIN',        'ACTIVE'),
-('pdt01',       'pdt@phenikaa.edu.vn',          'Phòng Đào tạo',       'TRAINING_DEPT','ACTIVE'),
-('truongnganh', 'truongnganh@phenikaa.edu.vn',  'Trưởng ngành KTPM',   'DEPT_HEAD',    'ACTIVE'),
-('gv_nhat',     'nhat.gv@phenikaa.edu.vn',      'Nguyễn Văn Nhật GV',  'LECTURER',     'ACTIVE'),
-('gv_viet',     'viet.gv@phenikaa.edu.vn',      'Nghiêm Đức Việt GV',  'LECTURER',     'ACTIVE'),
-('23010887',       '23010887@st.phenikaa.edu.vn',     'Sinh viên Nguyễn A',  'STUDENT',      'ACTIVE'),
-('23010888',       '23010887@st.phenikaa.edu.vn',     'Sinh viên Trần B',    'STUDENT',      'ACTIVE');
+INSERT INTO users (username, email, first_name, last_name, status) VALUES
+('admin',       'admin@phenikaa.edu.vn',        'System',        'Admin',          'ACTIVE'),
+('pdt01',       'nhatcoifacebook@gmail.com',          'Phòng',        'Đào tạo',        'ACTIVE'),
+('truongnganh', 'vnhat64.work@gmail.com',  'Trưởng ngành', 'KTPM',           'ACTIVE'),
+('gv_nhat',     'inodev.0604@gmail.com',      'Nguyễn Văn',   'Nhật GV',        'ACTIVE'),
+('gv_viet',     'viet.gv@phenikaa.edu.vn',      'Nghiêm Đức',   'Việt GV',        'ACTIVE'),
+('sv001',       '23010636@st.phenikaa.edu.vn',     'Sinh viên',    'Nguyễn A',       'ACTIVE'),
+('sv002',       '23010887@st.phenikaa.edu.vn',     'Sinh viên',    'Trần B',         'ACTIVE');
 
-INSERT INTO lecturers (user_id, lecturer_code, faculty_id, academic_rank, academic_degree, research_areas) VALUES
-((SELECT id FROM users WHERE username = 'gv_nhat'),  'GV001', (SELECT id FROM faculties WHERE code = 'CNTT'), 'Giảng viên', 'Thạc sĩ', 'Web, Software Engineering'),
-((SELECT id FROM users WHERE username = 'gv_viet'),  'GV002', (SELECT id FROM faculties WHERE code = 'CNTT'), 'Giảng viên', 'Thạc sĩ', 'AI, Machine Learning'),
-((SELECT id FROM users WHERE username = 'truongnganh'), 'GV000', (SELECT id FROM faculties WHERE code = 'CNTT'), 'Phó Giáo sư', 'Tiến sĩ', 'Software Architecture');
+-- Map user roles
+INSERT INTO user_roles (user_id, role_id) VALUES
+((SELECT id FROM users WHERE username = 'admin'), (SELECT id FROM roles WHERE code = 'ADMIN')),
+((SELECT id FROM users WHERE username = 'pdt01'), (SELECT id FROM roles WHERE code = 'TRAINING_DEPT')),
+-- Trưởng ngành có 2 role: DEPT_HEAD và LECTURER
+((SELECT id FROM users WHERE username = 'truongnganh'), (SELECT id FROM roles WHERE code = 'DEPT_HEAD')),
+((SELECT id FROM users WHERE username = 'truongnganh'), (SELECT id FROM roles WHERE code = 'LECTURER')),
+((SELECT id FROM users WHERE username = 'gv_nhat'), (SELECT id FROM roles WHERE code = 'LECTURER')),
+((SELECT id FROM users WHERE username = 'gv_viet'), (SELECT id FROM roles WHERE code = 'LECTURER')),
+((SELECT id FROM users WHERE username = 'sv001'), (SELECT id FROM roles WHERE code = 'STUDENT')),
+((SELECT id FROM users WHERE username = 'sv002'), (SELECT id FROM roles WHERE code = 'STUDENT'));
 
-INSERT INTO students (user_id, student_code, major_id, cohort, gpa, accumulated_credits, eligible_for_thesis) VALUES
-((SELECT id FROM users WHERE username = 'sv001'), '23010887', (SELECT id FROM majors WHERE code = 'KTPM'), 'K17', 3.20, 132, TRUE),
-((SELECT id FROM users WHERE username = 'sv002'), '23010636', (SELECT id FROM majors WHERE code = 'KTPM'), 'K17', 2.85, 130, TRUE);
+INSERT INTO lecturers (user_id, lecturer_code, faculty_id) VALUES
+((SELECT id FROM users WHERE username = 'gv_nhat'),  'GV001', (SELECT id FROM faculties WHERE code = 'HTTT')),
+((SELECT id FROM users WHERE username = 'gv_viet'),  'GV002', (SELECT id FROM faculties WHERE code = 'HTTT')),
+((SELECT id FROM users WHERE username = 'truongnganh'), 'GV000', (SELECT id FROM faculties WHERE code = 'HTTT'));
+
+INSERT INTO students (user_id, student_code, major_id, cohort, eligible_for_thesis) VALUES
+((SELECT id FROM users WHERE username = 'sv001'), '23010887', (SELECT id FROM majors WHERE code = 'KTPM'), 'K17', TRUE),
+((SELECT id FROM users WHERE username = 'sv002'), '23010636', (SELECT id FROM majors WHERE code = 'KTPM'), 'K17', TRUE);
 

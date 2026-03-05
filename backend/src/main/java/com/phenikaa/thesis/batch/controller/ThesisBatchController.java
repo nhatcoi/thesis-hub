@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -43,9 +42,23 @@ public class ThesisBatchController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<ThesisBatchResponse>>> list(
-            @RequestParam(required = false) BatchStatus status) {
-        return ResponseEntity.ok(ApiResponse.ok(thesisBatchService.listBatches(status)));
+    public ApiResponse<org.springframework.data.domain.Page<ThesisBatchResponse>> list(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) BatchStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sort) {
+
+        String[] sortParts = sort.split(",");
+        org.springframework.data.domain.Sort sortObj = org.springframework.data.domain.Sort.by(
+                sortParts.length > 1 && sortParts[1].equalsIgnoreCase("asc")
+                        ? org.springframework.data.domain.Sort.Direction.ASC
+                        : org.springframework.data.domain.Sort.Direction.DESC,
+                sortParts[0]);
+
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size,
+                sortObj);
+        return ApiResponse.ok(thesisBatchService.listBatches(search, status, pageable));
     }
 
     @PutMapping("/{id}")
