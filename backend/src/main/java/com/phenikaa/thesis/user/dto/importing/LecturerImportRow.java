@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @JsonPropertyOrder({
         "username", "external_id", "email", "first_name", "last_name",
-        "role", "faculty_code", "max_students_per_batch"
+        "role", "faculty_code", "max_students_per_batch", "managed_major_code"
 })
 public class LecturerImportRow {
     private String username;
@@ -27,6 +27,9 @@ public class LecturerImportRow {
 
     @JsonProperty("faculty_code")
     private String facultyCode;
+
+    @JsonProperty("managed_major_code")
+    private String managedMajorCode;
 
     @JsonProperty("max_students_per_batch")
     private Integer maxStudentsPerBatch;

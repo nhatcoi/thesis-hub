@@ -75,6 +75,7 @@ public class UserImportRowProcessor {
                 lecturer.setUser(user);
                 lecturer.setLecturerCode(row.getUsername());
                 lecturer.setFaculty(faculty);
+                lecturer.setManagedMajorCode(row.getManagedMajorCode());
                 lecturer.setMaxStudentsPerBatch(
                                 row.getMaxStudentsPerBatch() != null ? row.getMaxStudentsPerBatch() : 5);
 

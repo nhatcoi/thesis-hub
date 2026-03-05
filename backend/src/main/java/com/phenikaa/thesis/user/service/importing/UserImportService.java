@@ -166,6 +166,7 @@ public class UserImportService {
             case "last_name" -> "Họ";
             case "faculty_code" -> "Mã khoa";
             case "major_code" -> "Mã ngành";
+            case "managed_major_code" -> "Ngành quản lý";
             case "phone" -> "Số điện thoại";
             case "status" -> "Trạng thái";
             case "role" -> "Vai trò";
