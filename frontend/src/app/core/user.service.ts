@@ -20,6 +20,7 @@ export interface UserCreateRequest {
 
     // Lecturer specific
     facultyCode?: string;
+    managedMajorCode?: string; // New field
     maxStudentsPerBatch?: number;
 }
 
@@ -36,6 +37,8 @@ export interface UserResponse {
     majorName?: string;
     facultyId?: string;
     majorId?: string;
+    managedMajorId?: string;
+    managedMajorName?: string;
 }
 
 export interface PageResponse<T> {

@@ -18,6 +18,10 @@ export interface ThesisResponse {
     batchName: string;
     advisorId: string;
     advisorName: string;
+    majorId: string;
+    majorName: string;
+    facultyId: string;
+    facultyName: string;
     status: ThesisStatus;
 }
 
