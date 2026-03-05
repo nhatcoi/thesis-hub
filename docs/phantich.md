@@ -46,7 +46,7 @@ Hệ thống có **5 actor chính**:
 | Sinh viên            | đăng ký đề tài, nộp báo cáo |
 | Giảng viên           | hướng dẫn, đánh giá         |
 | Hội đồng             | phản biện và chấm           |
-| Trưởng bộ môn / Khoa | phê duyệt đề tài            |
+| Trưởng ngành / Khoa | phê duyệt đề tài            |
 | Phòng đào tạo        | quản lý toàn bộ             |
 
 ➡️ Đây là **RBAC multi-role system**. 

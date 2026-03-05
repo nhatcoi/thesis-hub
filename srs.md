@@ -99,7 +99,7 @@ cập nhật tiến độ, nộp báo cáo và xem kết quả đánh giá.
 hệ thống để xem thông tin đồ án được phân công, chấm điểm và nhập nhận xét.
 
 
-**Trưởng bộ môn/Khoa** : Quản lý và phê duyệt đề tài, phân công giảng viên hướng dẫn, tổ
+**Trưởng ngành/Khoa** : Quản lý và phê duyệt đề tài, phân công giảng viên hướng dẫn, tổ
 chức hội đồng bảo vệ và theo dõi tổng quan tình hình đồ án của bộ môn/khoa.
 
 
@@ -374,7 +374,7 @@ kỳ/năm học mới trên hệ thống.
 cũng cho phép sinh viên tự đề xuất đề tài cá nhân.
 
 
-**BP-3 (Phê duyệt danh mục):** Trưởng bộ môn hoặc Ban lãnh đạo Khoa tiến hành
+**BP-3 (Phê duyệt danh mục):** Trưởng ngành hoặc Ban lãnh đạo Khoa tiến hành
 xem xét, chỉnh sửa và phê duyệt các đề tài hợp lệ để hiển thị cho sinh viên.
 
 
@@ -386,7 +386,7 @@ xem xét, chỉnh sửa và phê duyệt các đề tài hợp lệ để hiển
 chọn sinh viên phù hợp nhất với đề tài của mình.
 
 
-**BP-6 (Chốt danh sách):** Trưởng bộ môn/Khoa kiểm duyệt lại toàn bộ danh sách
+**BP-6 (Chốt danh sách):** Trưởng ngành/Khoa kiểm duyệt lại toàn bộ danh sách
 phân công để đảm bảo tính công bằng và đúng quy định trước khi phê duyệt cuối
 cùng.
 
@@ -412,7 +412,7 @@ slide lên hệ thống theo đúng thời hạn quy định.
 nhập điểm thành phần (điểm hướng dẫn).
 
 
-**BP-10 (Tổ chức Hội đồng):** Trưởng bộ môn/Khoa tiến hành thành lập các Hội đồng
+**BP-10 (Tổ chức Hội đồng):** Trưởng ngành/Khoa tiến hành thành lập các Hội đồng
 bảo vệ và chỉ định các thành viên tương ứng.
 
 
@@ -480,7 +480,7 @@ thức) cho sinh viên tham khảo.
 đã có ý tưởng và GVHD đồng ý).
 
 
-**R2.3.** Hệ thống cho phép trưởng bộ môn/khoa xem, xét duyệt hoặc từ chối đề tài dựa
+**R2.3.** Hệ thống cho phép Trưởng ngành/khoa xem, xét duyệt hoặc từ chối đề tài dựa
 trên tính khả thi và chuyên môn.
 
 
@@ -510,7 +510,7 @@ vọng theo thứ tự ưu tiên.
 mình và thực hiện lựa chọn/chấp nhận.
 
 
-**R3.4.** Hệ thống cho phép trưởng bộ môn/khoa phân công giảng viên hướng dẫn cho
+**R3.4.** Hệ thống cho phép Trưởng ngành/khoa phân công giảng viên hướng dẫn cho
 sinh viên (đối với các trường hợp chưa có nhóm).
 
 
@@ -551,7 +551,7 @@ minh chứng đánh giá thái độ.
 **R5. Quản lý hội đồng bảo vệ và lịch bảo vệ**
 
 
-**R5.1.** Hệ thống cho phép trưởng bộ môn/khoa ra quyết định thành lập hội đồng bảo
+**R5.1.** Hệ thống cho phép Trưởng ngành/khoa ra quyết định thành lập hội đồng bảo
 vệ (gồm Chủ tịch, Thư ký, Ủy viên).
 
 
@@ -590,7 +590,7 @@ và nhận xét về sinh viên.
 của nhà trường.
 
 
-**R6.4.** Hệ thống cho phép trưởng bộ môn/khoa rà soát và phê duyệt bảng điểm cuối
+**R6.4.** Hệ thống cho phép Trưởng ngành/khoa rà soát và phê duyệt bảng điểm cuối
 cùng.
 
 
@@ -845,7 +845,7 @@ thời gian người dùng không hoạt động.
 |**Tác**<br>**nhân**<br>**chính**|Phòng Đào tạo.|Phòng Đào tạo.|Phòng Đào tạo.|
 |**Tác**<br>**nhân**<br>**phụ (nếu có)**|Trưởng Khoa (có thể tham gia tham vấn).|Trưởng Khoa (có thể tham gia tham vấn).|Trưởng Khoa (có thể tham gia tham vấn).|
 |**Sự kiện kích**<br>**hoạt**|Sau khi kết thúc giai đoạn phản biện và có danh sách<br>sinh viên đủ điều kiện bảo vệ.|Sau khi kết thúc giai đoạn phản biện và có danh sách<br>sinh viên đủ điều kiện bảo vệ.|Sau khi kết thúc giai đoạn phản biện và có danh sách<br>sinh viên đủ điều kiện bảo vệ.|
-|**Tiền**<br>**điều**<br>**kiện**|1. Các Hội đồng bảo vệ đã được Trưởng bộ môn/Khoa<br>thành lập (UC-3.3).<br> <br>|1. Các Hội đồng bảo vệ đã được Trưởng bộ môn/Khoa<br>thành lập (UC-3.3).<br> <br>|1. Các Hội đồng bảo vệ đã được Trưởng bộ môn/Khoa<br>thành lập (UC-3.3).<br> <br>|
+|**Tiền**<br>**điều**<br>**kiện**|1. Các Hội đồng bảo vệ đã được Trưởng ngành/Khoa<br>thành lập (UC-3.3).<br> <br>|1. Các Hội đồng bảo vệ đã được Trưởng ngành/Khoa<br>thành lập (UC-3.3).<br> <br>|1. Các Hội đồng bảo vệ đã được Trưởng ngành/Khoa<br>thành lập (UC-3.3).<br> <br>|
 
 
 |Col1|2. Sinh viên đã hoàn thành đóng học phí và nộp báo cáo<br>đúng hạn.|
@@ -961,11 +961,11 @@ thời gian người dùng không hoạt động.
 |Số và tên UC|UC-3.1: Phê duyệt đề tài đồ án|Col3|Col4|
 |---|---|---|---|
 |**Người**<br>**tạo**<br>**UC**|Admin|**Người**<br>**tạo**<br>**UC**|Admin|
-|**Mô tả**|Cho phép Trưởng bộ môn/Khoa xem xét nội dung các đề<br>tài do Giảng viên hoặc Sinh viên đề xuất và đưa ra quyết<br>định chấp thuận hoặc từ chối dựa trên tính khả thi và<br>chuyên môn.|Cho phép Trưởng bộ môn/Khoa xem xét nội dung các đề<br>tài do Giảng viên hoặc Sinh viên đề xuất và đưa ra quyết<br>định chấp thuận hoặc từ chối dựa trên tính khả thi và<br>chuyên môn.|Cho phép Trưởng bộ môn/Khoa xem xét nội dung các đề<br>tài do Giảng viên hoặc Sinh viên đề xuất và đưa ra quyết<br>định chấp thuận hoặc từ chối dựa trên tính khả thi và<br>chuyên môn.|
-|**Tác**<br>**nhân**<br>**chính**|Trưởng Bộ môn/Khoa.|Trưởng Bộ môn/Khoa.|Trưởng Bộ môn/Khoa.|
+|**Mô tả**|Cho phép Trưởng ngành/Khoa xem xét nội dung các đề<br>tài do Giảng viên hoặc Sinh viên đề xuất và đưa ra quyết<br>định chấp thuận hoặc từ chối dựa trên tính khả thi và<br>chuyên môn.|Cho phép Trưởng ngành/Khoa xem xét nội dung các đề<br>tài do Giảng viên hoặc Sinh viên đề xuất và đưa ra quyết<br>định chấp thuận hoặc từ chối dựa trên tính khả thi và<br>chuyên môn.|Cho phép Trưởng ngành/Khoa xem xét nội dung các đề<br>tài do Giảng viên hoặc Sinh viên đề xuất và đưa ra quyết<br>định chấp thuận hoặc từ chối dựa trên tính khả thi và<br>chuyên môn.|
+|**Tác**<br>**nhân**<br>**chính**|Trưởng ngành/Khoa.|Trưởng ngành/Khoa.|Trưởng ngành/Khoa.|
 |**Tác**<br>**nhân**<br>**phụ (nếu có)**||||
 |**Sự kiện kích**<br>**hoạt**|Sau khi Giảng viên/Sinh viên hoàn tất việc gửi đề xuất đề<br>tài lên hệ thống.|Sau khi Giảng viên/Sinh viên hoàn tất việc gửi đề xuất đề<br>tài lên hệ thống.|Sau khi Giảng viên/Sinh viên hoàn tất việc gửi đề xuất đề<br>tài lên hệ thống.|
-|**Tiền**<br>**điều**<br>**kiện**|1. Đăng nhập với quyền Trưởng Bộ môn/Khoa.<br> <br>|1. Đăng nhập với quyền Trưởng Bộ môn/Khoa.<br> <br>|1. Đăng nhập với quyền Trưởng Bộ môn/Khoa.<br> <br>|
+|**Tiền**<br>**điều**<br>**kiện**|1. Đăng nhập với quyền Trưởng ngành/Khoa.<br> <br>|1. Đăng nhập với quyền Trưởng ngành/Khoa.<br> <br>|1. Đăng nhập với quyền Trưởng ngành/Khoa.<br> <br>|
 
 
 |Col1|2. Có danh sách đề tài ở trạng thái "Chờ duyệt".|
@@ -979,7 +979,7 @@ thời gian người dùng không hoạt động.
 |Col1|2. Người dùng xem xét cảnh báo và quyết định có duyệt<br>hay không.|
 |---|---|
 |**Độ ưu tiên**|Cao.|
-|**Các quy tắc**<br>**nghiệp vụ**|Chỉ có Trưởng bộ môn/Khoa mới có quyền duyệt đề tài<br>thuộc phạm vi quản lý của đơn vị mình.|
+|**Các quy tắc**<br>**nghiệp vụ**|Chỉ có Trưởng ngành/Khoa mới có quyền duyệt đề tài<br>thuộc phạm vi quản lý của đơn vị mình.|
 |**Các**<br>**giả**<br>**thuyết**|Không.|
 
 
@@ -999,7 +999,7 @@ thời gian người dùng không hoạt động.
 |---|---|---|---|
 |**Người**<br>**tạo**<br>**UC**|Admin|**Người**<br>**tạo**<br>**UC**|Admin|
 |**Mô tả**|Phân công Giảng viên hướng dẫn cho các sinh viên hoặc<br>nhóm sinh viên chưa tìm được người hướng dẫn sau đợt<br>đăng ký, hoặc điều chỉnh phân công trong trường hợp<br>đặc biệt.|Phân công Giảng viên hướng dẫn cho các sinh viên hoặc<br>nhóm sinh viên chưa tìm được người hướng dẫn sau đợt<br>đăng ký, hoặc điều chỉnh phân công trong trường hợp<br>đặc biệt.|Phân công Giảng viên hướng dẫn cho các sinh viên hoặc<br>nhóm sinh viên chưa tìm được người hướng dẫn sau đợt<br>đăng ký, hoặc điều chỉnh phân công trong trường hợp<br>đặc biệt.|
-|**Tác**<br>**nhân**<br>**chính**|Trưởng Bộ môn/Khoa.|Trưởng Bộ môn/Khoa.|Trưởng Bộ môn/Khoa.|
+|**Tác**<br>**nhân**<br>**chính**|Trưởng ngành/Khoa.|Trưởng ngành/Khoa.|Trưởng ngành/Khoa.|
 |**Tác**<br>**nhân**<br>**phụ (nếu có)**|Không.|Không.|Không.|
 |**Sự kiện kích**<br>**hoạt**|Kết thúc đợt đăng ký tự do, vẫn còn sinh viên chưa có<br>GVHD.|Kết thúc đợt đăng ký tự do, vẫn còn sinh viên chưa có<br>GVHD.|Kết thúc đợt đăng ký tự do, vẫn còn sinh viên chưa có<br>GVHD.|
 |**Tiền**<br>**điều**<br>**kiện**|Danh sách sinh viên chưa có GVHD và danh sách GV<br>còn chỉ tiêu hướng dẫn.|Danh sách sinh viên chưa có GVHD và danh sách GV<br>còn chỉ tiêu hướng dẫn.|Danh sách sinh viên chưa có GVHD và danh sách GV<br>còn chỉ tiêu hướng dẫn.|
@@ -1020,7 +1020,7 @@ thời gian người dùng không hoạt động.
 |---|---|---|---|
 |**Người**<br>**tạo**<br>**UC**|Admin|**Người**<br>**tạo**<br>**UC**|Admin|
 |**Mô tả**|Tạo lập các hội đồng chấm đồ án, bao gồm việc chỉ định<br>các thành viên giữ vai trò Chủ tịch, Thư ký, và Ủy<br>viên/Phản biện.|Tạo lập các hội đồng chấm đồ án, bao gồm việc chỉ định<br>các thành viên giữ vai trò Chủ tịch, Thư ký, và Ủy<br>viên/Phản biện.|Tạo lập các hội đồng chấm đồ án, bao gồm việc chỉ định<br>các thành viên giữ vai trò Chủ tịch, Thư ký, và Ủy<br>viên/Phản biện.|
-|**Tác**<br>**nhân**<br>**chính**|Trưởng Bộ môn/Khoa.|Trưởng Bộ môn/Khoa.|Trưởng Bộ môn/Khoa.|
+|**Tác**<br>**nhân**<br>**chính**|Trưởng ngành/Khoa.|Trưởng ngành/Khoa.|Trưởng ngành/Khoa.|
 |**Tác**<br>**nhân**<br>**phụ (nếu có)**||||
 |**Sự kiện kích**<br>**hoạt**|Chuẩn bị cho đợt bảo vệ đồ án cuối kỳ.|Chuẩn bị cho đợt bảo vệ đồ án cuối kỳ.|Chuẩn bị cho đợt bảo vệ đồ án cuối kỳ.|
 |**Tiền**<br>**điều**<br>**kiện**|Có danh sách giảng viên sẵn sàng tham gia hội đồng.|Có danh sách giảng viên sẵn sàng tham gia hội đồng.|Có danh sách giảng viên sẵn sàng tham gia hội đồng.|
@@ -1059,7 +1059,7 @@ thời gian người dùng không hoạt động.
 |---|---|---|---|
 |**Người**<br>**tạo**<br>**UC**|Admin|**Người**<br>**tạo**<br>**UC**|Admin|
 |**Mô tả**|Xem các báo cáo thống kê chi tiết trong phạm vi Khoa/Bộ<br>môn (Tình hình đăng ký đề tài của các bộ môn, tiến độ<br>thực hiện của sinh viên trong khoa).|Xem các báo cáo thống kê chi tiết trong phạm vi Khoa/Bộ<br>môn (Tình hình đăng ký đề tài của các bộ môn, tiến độ<br>thực hiện của sinh viên trong khoa).|Xem các báo cáo thống kê chi tiết trong phạm vi Khoa/Bộ<br>môn (Tình hình đăng ký đề tài của các bộ môn, tiến độ<br>thực hiện của sinh viên trong khoa).|
-|**Tác**<br>**nhân**<br>**chính**|Trưởng Bộ môn/Khoa.|Trưởng Bộ môn/Khoa.|Trưởng Bộ môn/Khoa.|
+|**Tác**<br>**nhân**<br>**chính**|Trưởng ngành/Khoa.|Trưởng ngành/Khoa.|Trưởng ngành/Khoa.|
 |**Tác**<br>**nhân**<br>**phụ (nếu có)**|Không.|Không.|Không.|
 |**Sự kiện kích**<br>**hoạt**|Khi cần theo dõi tiến độ hoặc làm báo cáo định kỳ.|Khi cần theo dõi tiến độ hoặc làm báo cáo định kỳ.|Khi cần theo dõi tiến độ hoặc làm báo cáo định kỳ.|
 
@@ -1097,7 +1097,7 @@ thời gian người dùng không hoạt động.
 |---|---|
 |**Sự kiện kích**<br>**hoạt**|Khi Phòng Đào tạo mở đợt "Đăng ký đề tài" (UC-2.1).|
 |**Tiền**<br>**điều**<br>**kiện**|1. Giảng viên đã đăng nhập hệ thống.<br> <br> <br>2. Đợt đăng ký đang ở trạng thái "Mở" cho Giảng viên.|
-|**Hậu**<br>**điều**<br>**kiện**|Đề tài được lưu vào hệ thống ở trạng thái "Chờ duyệt"<br>(bởi Trưởng bộ môn).|
+|**Hậu**<br>**điều**<br>**kiện**|Đề tài được lưu vào hệ thống ở trạng thái "Chờ duyệt"<br>(bởi Trưởng ngành).|
 |**Luồng thông**<br>**thường**|1. Giảng viên chọn chức năng "Quản lý đề tài" -> "Thêm<br>mới".<br> <br> <br>2. Hệ thống hiển thị form nhập: Tên đề tài, Mô tả chi tiết,<br>Yêu cầu kiến thức/kỹ năng, Số lượng sinh viên tối đa.<br> <br> <br>3. Giảng viên nhập đầy đủ thông tin.<br> <br> <br>4. Giảng viên nhấn "Lưu đề xuất".<br> <br> <br>5. Hệ thống kiểm tra tính hợp lệ (không bỏ trống trường bắt<br>buộc).<br> <br> <br>6. Hệ thống lưu đề tài và đặt trạng thái là "Chờ duyệt".<br> <br> <br>7. Hệ thống thông báo "Đăng ký thành công, vui lòng chờ<br>duyệt".|
 |**Luồng thay**<br>**thế**|**A1: Hủy bỏ** <br> <br> <br>Giảng viên nhấn "Hủy" -> Hệ thống không lưu dữ liệu.|
 |**Các ngoại lệ**|**E1: Hết hạn đăng ký** <br> <br>|
@@ -1106,7 +1106,7 @@ thời gian người dùng không hoạt động.
 |Col1|Hệ thống thông báo "Đợt đăng ký đã kết thúc" và khóa<br>chức năng thêm mới.|
 |---|---|
 |**Độ ưu tiên**|Cao.|
-|**Quy**<br>**tắc**<br>**nghiệp vụ**|Đề tài sau khi được Trưởng bộ môn duyệt (UC-3.1) mới<br>hiển thị cho sinh viên thấy.|
+|**Quy**<br>**tắc**<br>**nghiệp vụ**|Đề tài sau khi được Trưởng ngành duyệt (UC-3.1) mới<br>hiển thị cho sinh viên thấy.|
 
 
 
@@ -1134,7 +1134,7 @@ thời gian người dùng không hoạt động.
 |**Tác**<br>**nhân**<br>**chính**|Giảng viên.|Giảng viên.|Giảng viên.|
 |**Sự kiện kích**<br>**hoạt**|Khi Phòng Đào tạo mở đợt "Đăng ký đề tài" (UC-2.1).|Khi Phòng Đào tạo mở đợt "Đăng ký đề tài" (UC-2.1).|Khi Phòng Đào tạo mở đợt "Đăng ký đề tài" (UC-2.1).|
 |**Tiền**<br>**điều**<br>**kiện**|1. Giảng viên đã đăng nhập hệ thống.<br> <br> <br>2. Đợt đăng ký đang ở trạng thái "Mở" cho Giảng viên.|1. Giảng viên đã đăng nhập hệ thống.<br> <br> <br>2. Đợt đăng ký đang ở trạng thái "Mở" cho Giảng viên.|1. Giảng viên đã đăng nhập hệ thống.<br> <br> <br>2. Đợt đăng ký đang ở trạng thái "Mở" cho Giảng viên.|
-|**Hậu**<br>**điều**<br>**kiện**|Đề tài được lưu vào hệ thống ở trạng thái "Chờ duyệt"<br>(bởi Trưởng bộ môn).|Đề tài được lưu vào hệ thống ở trạng thái "Chờ duyệt"<br>(bởi Trưởng bộ môn).|Đề tài được lưu vào hệ thống ở trạng thái "Chờ duyệt"<br>(bởi Trưởng bộ môn).|
+|**Hậu**<br>**điều**<br>**kiện**|Đề tài được lưu vào hệ thống ở trạng thái "Chờ duyệt"<br>(bởi Trưởng ngành).|Đề tài được lưu vào hệ thống ở trạng thái "Chờ duyệt"<br>(bởi Trưởng ngành).|Đề tài được lưu vào hệ thống ở trạng thái "Chờ duyệt"<br>(bởi Trưởng ngành).|
 |**Luồng thông**<br>**thường**|1. Giảng viên chọn chức năng "Quản lý đề tài" -> "Thêm<br>mới".<br> <br> <br>2. Hệ thống hiển thị form nhập: Tên đề tài, Mô tả chi tiết,<br>Yêu cầu kiến thức/kỹ năng, Số lượng sinh viên tối đa.<br> <br> <br>3. Giảng viên nhập đầy đủ thông tin.<br> <br> <br>4. Giảng viên nhấn "Lưu đề xuất".<br> <br>|1. Giảng viên chọn chức năng "Quản lý đề tài" -> "Thêm<br>mới".<br> <br> <br>2. Hệ thống hiển thị form nhập: Tên đề tài, Mô tả chi tiết,<br>Yêu cầu kiến thức/kỹ năng, Số lượng sinh viên tối đa.<br> <br> <br>3. Giảng viên nhập đầy đủ thông tin.<br> <br> <br>4. Giảng viên nhấn "Lưu đề xuất".<br> <br>|1. Giảng viên chọn chức năng "Quản lý đề tài" -> "Thêm<br>mới".<br> <br> <br>2. Hệ thống hiển thị form nhập: Tên đề tài, Mô tả chi tiết,<br>Yêu cầu kiến thức/kỹ năng, Số lượng sinh viên tối đa.<br> <br> <br>3. Giảng viên nhập đầy đủ thông tin.<br> <br> <br>4. Giảng viên nhấn "Lưu đề xuất".<br> <br>|
 
 
@@ -1143,7 +1143,7 @@ thời gian người dùng không hoạt động.
 |**Luồng thay**<br>**thế**|**A1: Hủy bỏ** <br> <br> <br>Giảng viên nhấn "Hủy" -> Hệ thống không lưu dữ liệu.|
 |**Các ngoại lệ**|**E1: Hết hạn đăng ký** <br> <br> <br>Hệ thống thông báo "Đợt đăng ký đã kết thúc" và khóa<br>chức năng thêm mới.|
 |**Độ ưu tiên**|Cao.|
-|**Quy**<br>**tắc**<br>**nghiệp vụ**|Đề tài sau khi được Trưởng bộ môn duyệt (UC-3.1) mới<br>hiển thị cho sinh viên thấy.|
+|**Quy**<br>**tắc**<br>**nghiệp vụ**|Đề tài sau khi được Trưởng ngành duyệt (UC-3.1) mới<br>hiển thị cho sinh viên thấy.|
 
 
 ### _Giao diện minh họa: Xây dựng giao diện minh họa theo luồng sự kiện đã mô tả_ _trong phần trên. Lưu ý trong giao diện minh họa có dữ liệu minh họa. Nên sử dụng_ _các công cụ tạo giao diện mock-up như https://balsamiq.com/wireframes/ hoặc_ _https://www.figma.com/_ **Tên Use-case 1 (Ví dụ UC1.2. Thêm mới thành viên)** …

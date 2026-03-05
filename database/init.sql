@@ -111,8 +111,9 @@ CREATE TABLE lecturers (
     id                      UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id                 UUID UNIQUE NOT NULL REFERENCES users(id),
     lecturer_code           VARCHAR(20) UNIQUE NOT NULL,
-    faculty_id              UUID NOT NULL REFERENCES faculties(id),
-    max_students_per_batch  INT DEFAULT 5,
+    faculty_id             UUID NOT NULL REFERENCES faculties(id),
+    managed_major_code     VARCHAR(20),
+    max_students_per_batch INT DEFAULT 5,
     created_at              TIMESTAMPTZ DEFAULT NOW(),
     updated_at              TIMESTAMPTZ DEFAULT NOW()
 );
@@ -602,7 +603,7 @@ INSERT INTO rooms (code, name, capacity, building) VALUES
 INSERT INTO roles (code, name) VALUES
 ('ADMIN', 'Quản trị hệ thống'),
 ('TRAINING_DEPT', 'Phòng Đào tạo'),
-('DEPT_HEAD', 'Trưởng bộ môn / Ngành'),
+('DEPT_HEAD', 'Trưởng ngành / Ngành'),
 ('LECTURER', 'Giảng viên'),
 ('STUDENT', 'Sinh viên');
 
@@ -628,10 +629,10 @@ INSERT INTO user_roles (user_id, role_id) VALUES
 ((SELECT id FROM users WHERE username = 'sv001'), (SELECT id FROM roles WHERE code = 'STUDENT')),
 ((SELECT id FROM users WHERE username = 'sv002'), (SELECT id FROM roles WHERE code = 'STUDENT'));
 
-INSERT INTO lecturers (user_id, lecturer_code, faculty_id) VALUES
-((SELECT id FROM users WHERE username = 'gv_nhat'),  'GV001', (SELECT id FROM faculties WHERE code = 'HTTT')),
-((SELECT id FROM users WHERE username = 'gv_viet'),  'GV002', (SELECT id FROM faculties WHERE code = 'HTTT')),
-((SELECT id FROM users WHERE username = 'truongnganh'), 'GV000', (SELECT id FROM faculties WHERE code = 'HTTT'));
+INSERT INTO lecturers (user_id, lecturer_code, faculty_id, managed_major_code) VALUES
+((SELECT id FROM users WHERE username = 'gv_nhat'),  'GV001', (SELECT id FROM faculties WHERE code = 'HTTT'), NULL),
+((SELECT id FROM users WHERE username = 'gv_viet'),  'GV002', (SELECT id FROM faculties WHERE code = 'HTTT'), NULL),
+((SELECT id FROM users WHERE username = 'truongnganh'), 'GV000', (SELECT id FROM faculties WHERE code = 'HTTT'), 'KTPM');
 
 INSERT INTO students (user_id, student_code, major_id, cohort, eligible_for_thesis) VALUES
 ((SELECT id FROM users WHERE username = 'sv001'), '23010887', (SELECT id FROM majors WHERE code = 'KTPM'), 'K17', TRUE),
