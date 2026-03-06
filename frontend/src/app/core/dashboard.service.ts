@@ -8,6 +8,8 @@ export interface DashboardStats {
     totalLecturers: number;
     totalTopics: number;
     totalBatches: number;
+    totalAdvisingTheses: number;
+    totalAssignedTopics: number;
     topicsByStatus: Record<string, number>;
     batchesByStatus: Record<string, number>;
     eligibleStudents: number;

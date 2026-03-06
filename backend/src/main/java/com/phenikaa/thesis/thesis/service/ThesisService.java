@@ -181,6 +181,17 @@ public class ThesisService {
         thesisRepo.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
+    public List<ThesisResponse> getAdvisingTheses(com.phenikaa.thesis.user.entity.User user) {
+        if (user.getLecturer() == null) {
+            return new ArrayList<>();
+        }
+        return thesisRepo.findByAdvisorId(user.getLecturer().getId())
+                .stream()
+                .map(this::mapToResponse)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
     private ThesisResponse mapToResponse(Thesis thesis) {
         return mapToResponse(thesis.getStudent(), thesis);
     }

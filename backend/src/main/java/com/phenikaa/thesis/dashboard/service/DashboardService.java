@@ -10,6 +10,8 @@ import com.phenikaa.thesis.user.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.phenikaa.thesis.user.entity.User;
+import com.phenikaa.thesis.thesis.repository.ThesisRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,12 +24,36 @@ public class DashboardService {
     private final LecturerRepository lecturerRepo;
     private final ThesisBatchRepository batchRepo;
     private final TopicRepository topicRepo;
+    private final ThesisRepository thesisRepo;
 
     @Transactional(readOnly = true)
-    public DashboardStatsResponse getStats(com.phenikaa.thesis.user.entity.User user) {
-        // Temporarily return global stats for all roles including DEPT_HEAD
-        // until major relationship is restored with DB migration
+    public DashboardStatsResponse getStats(User user) {
+        boolean isLecturer = user.getRoles().stream().anyMatch(r -> r.getCode().equals("LECTURER"));
+        boolean isDeptHead = user.getRoles().stream().anyMatch(r -> r.getCode().equals("DEPT_HEAD"));
+
+        if (isLecturer && !isDeptHead) {
+            return getLecturerStats(user);
+        }
+
         return getGlobalStats();
+    }
+
+    private DashboardStatsResponse getLecturerStats(User user) {
+        Map<String, Long> topicsByStatus = new HashMap<>();
+        for (TopicStatus status : TopicStatus.values()) {
+            topicsByStatus.put(status.name(), topicRepo.countByProposedByIdAndStatus(user.getId(), status));
+        }
+
+        long advisingCount = 0;
+        if (user.getLecturer() != null) {
+            advisingCount = thesisRepo.countByAdvisorId(user.getLecturer().getId());
+        }
+
+        return DashboardStatsResponse.builder()
+                .totalTopics(topicRepo.countByProposedById(user.getId()))
+                .totalAdvisingTheses(advisingCount)
+                .topicsByStatus(topicsByStatus)
+                .build();
     }
 
     private DashboardStatsResponse getGlobalStats() {

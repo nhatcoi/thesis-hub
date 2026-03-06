@@ -18,4 +18,8 @@ public interface ThesisRepository extends JpaRepository<Thesis, UUID>, JpaSpecif
     boolean existsByStudentIdAndBatchId(UUID studentId, UUID batchId);
 
     java.util.Optional<Thesis> findByStudentIdAndBatchId(UUID studentId, UUID batchId);
+
+    long countByAdvisorId(UUID advisorId);
+
+    java.util.List<Thesis> findByAdvisorId(UUID advisorId);
 }

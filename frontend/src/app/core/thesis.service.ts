@@ -74,4 +74,9 @@ export class ThesisService {
     deleteThesis(id: string): Observable<void> {
         return this.http.delete(`${this.baseUrl}/${id}`).pipe(map(() => { }));
     }
+
+    getAdvisingTheses(): Observable<ThesisResponse[]> {
+        return this.http.get<{ data: ThesisResponse[] }>(`${this.baseUrl}/advising`)
+            .pipe(map(r => r.data));
+    }
 }

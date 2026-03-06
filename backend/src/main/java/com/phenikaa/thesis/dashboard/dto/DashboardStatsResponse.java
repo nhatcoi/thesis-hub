@@ -12,6 +12,8 @@ public class DashboardStatsResponse {
     private long totalLecturers;
     private long totalTopics;
     private long totalBatches;
+    private long totalAdvisingTheses; // Số lượng đồ án đang hướng dẫn
+    private long totalAssignedTopics; // Số lượng đề tài được giao (cho lecturer)
 
     private Map<String, Long> topicsByStatus;
     private Map<String, Long> batchesByStatus;

@@ -17,6 +17,18 @@ import java.util.UUID;
 public class ThesisController {
 
     private final ThesisService thesisService;
+    private final com.phenikaa.thesis.common.util.SecurityUtils securityUtils;
+
+    @GetMapping("/advising")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('LECTURER', 'DEPT_HEAD')")
+    public ApiResponse<java.util.List<ThesisResponse>> getAdvisingTheses() {
+        com.phenikaa.thesis.user.entity.User user = securityUtils.getCurrentUser();
+        if (user == null) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "Bạn cần đăng nhập để thực hiện thao tác này");
+        }
+        return ApiResponse.ok(thesisService.getAdvisingTheses(user));
+    }
 
     @GetMapping
     public ApiResponse<Page<ThesisResponse>> getTheses(

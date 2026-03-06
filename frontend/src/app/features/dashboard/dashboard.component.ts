@@ -19,7 +19,7 @@ import { CommonModule } from '@angular/common';
         <div class="bg-white shadow rounded-lg p-6 border-l-4 border-indigo-500">
           <div class="flex items-center justify-between">
             <div>
-              <h2 class="text-lg font-medium text-gray-900">Tổng quan hệ thống</h2>
+              <h2 class="text-lg font-bold text-gray-900">{{ isLecturerOnly() ? 'Tổng quan công việc' : 'Tổng quan hệ thống' }}</h2>
               <p class="text-sm text-gray-500 mt-1">Chào mừng <span class="font-bold text-indigo-600">{{ auth.currentUser()?.name }}</span> quay trở lại.</p>
             </div>
             <div class="text-right hidden sm:block">
@@ -138,12 +138,12 @@ import { CommonModule } from '@angular/common';
               <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider mb-4">Hoạt động Điều kiện Sinh viên</h3>
               <div class="flex items-center justify-around h-32">
                  <div class="text-center">
-                    <p class="text-3xl font-extrabold text-indigo-600">{{ stats()?.eligibleStudents || 0 }}</p>
+                    <p class="text-3xl font-bold text-indigo-600">{{ stats()?.eligibleStudents || 0 }}</p>
                     <p class="text-xs text-gray-500 mt-1 uppercase font-bold">Đủ điều kiện</p>
                  </div>
                  <div class="h-16 w-px bg-gray-200"></div>
                  <div class="text-center">
-                    <p class="text-3xl font-extrabold text-orange-500">{{ stats()?.ineligibleStudents || 0 }}</p>
+                    <p class="text-3xl font-bold text-orange-500">{{ stats()?.ineligibleStudents || 0 }}</p>
                     <p class="text-xs text-gray-500 mt-1 uppercase font-bold">Chưa đủ ĐK</p>
                  </div>
               </div>
@@ -151,6 +151,78 @@ import { CommonModule } from '@angular/common';
                 * Dữ liệu được cập nhật dựa trên GPA và số tín chỉ tích lũy của sinh viên.
               </p>
             </div>
+          </div>
+        }
+        
+        @if (isLecturerOnly()) {
+          <!-- Stats Grid for LECTURER -->
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <!-- Total Topics -->
+            <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
+              <div class="p-6">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 p-3 bg-indigo-50 rounded-xl">
+                    <mat-icon class="text-indigo-600">inventory_2</mat-icon>
+                  </div>
+                  <div class="ml-5">
+                    <p class="text-sm font-bold text-gray-500 uppercase">Đề tài đề xuất</p>
+                    <p class="text-3xl font-bold text-gray-900 leading-none mt-1">{{ stats()?.totalTopics || 0 }}</p>
+                  </div>
+                </div>
+                <div class="mt-6 flex gap-4 text-xs font-bold uppercase">
+                  <div class="flex flex-col">
+                    <span class="text-emerald-600">Sẵn sàng</span>
+                    <span class="text-gray-900 text-lg">{{ (stats()?.topicsByStatus?.['AVAILABLE'] || 0) + (stats()?.topicsByStatus?.['APPROVED'] || 0) }}</span>
+                  </div>
+                  <div class="w-px bg-gray-100 h-8 mt-1"></div>
+                  <div class="flex flex-col text-gray-400">
+                    <span>Đã đầy</span>
+                    <span class="text-gray-900 text-lg">{{ stats()?.topicsByStatus?.['FULL'] || 0 }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Advising -->
+            <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
+              <div class="p-6">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 p-3 bg-emerald-50 rounded-xl">
+                    <mat-icon class="text-emerald-600">groups</mat-icon>
+                  </div>
+                  <div class="ml-5">
+                    <p class="text-sm font-bold text-gray-500 uppercase tracking-wider">Đang hướng dẫn</p>
+                    <p class="text-3xl font-bold text-gray-900 leading-none mt-1">{{ stats()?.totalAdvisingTheses || 0 }}</p>
+                  </div>
+                </div>
+                <p class="mt-6 text-xs text-gray-400 font-medium">Số lượng sinh viên bạn đang trực tiếp hướng dẫn đồ án.</p>
+              </div>
+            </div>
+
+            <!-- Placeholder for future lecturer metrics -->
+            <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-100 flex items-center justify-center p-6 border-dashed">
+               <div class="text-center">
+                  <p class="text-gray-400 text-sm font-medium italic">Thống kê khác sắp ra mắt...</p>
+               </div>
+            </div>
+          </div>
+
+          <!-- Status Distribution -->
+          <div class="bg-white shadow-sm rounded-xl border border-gray-100 p-8">
+             <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-8 border-b border-gray-50 pb-4">Phân bổ trạng thái đề tài</h3>
+             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                @for (entry of getObjectEntries(stats()?.topicsByStatus); track entry[0]) {
+                  <div class="flex flex-col gap-2">
+                     <div class="flex justify-between items-end">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase">{{ getStatusLabel(entry[0]) }}</span>
+                        <span class="text-sm font-bold text-gray-900">{{ entry[1] }}</span>
+                     </div>
+                     <div class="w-full bg-gray-50 rounded-full h-1.5 overflow-hidden">
+                        <div [class]="getStatusBg(entry[0])" class="h-full rounded-full" [style.width.%]="(entry[1] / (stats()?.totalTopics || 1)) * 100"></div>
+                     </div>
+                  </div>
+                }
+             </div>
           </div>
         }
         
@@ -192,5 +264,33 @@ export class DashboardComponent implements OnInit {
   getObjectEntries(obj: any): [string, number][] {
     if (!obj) return [];
     return Object.entries(obj) as [string, number][];
+  }
+
+  isLecturerOnly(): boolean {
+    const role = this.auth.currentUser()?.activeRole;
+    return role === 'LECTURER';
+  }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case 'AVAILABLE': return 'Sẵn sàng';
+      case 'PENDING_APPROVAL': return 'Chờ duyệt';
+      case 'APPROVED': return 'Đã duyệt';
+      case 'REJECTED': return 'Từ chối';
+      case 'FULL': return 'Đã đầy';
+      case 'CLOSED': return 'Đã đóng';
+      default: return status;
+    }
+  }
+
+  getStatusBg(status: string): string {
+    switch (status) {
+      case 'AVAILABLE': return 'bg-emerald-500';
+      case 'PENDING_APPROVAL': return 'bg-amber-400';
+      case 'APPROVED': return 'bg-indigo-500';
+      case 'REJECTED': return 'bg-rose-500';
+      case 'FULL': return 'bg-gray-500';
+      default: return 'bg-indigo-600';
+    }
   }
 }
