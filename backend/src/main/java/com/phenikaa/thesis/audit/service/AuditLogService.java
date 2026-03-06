@@ -88,7 +88,10 @@ public class AuditLogService {
             return "Thao tác trên " + log.getEntityType();
 
         String name = String.valueOf(data.getOrDefault("name", ""));
+        String title = String.valueOf(data.getOrDefault("title", ""));
         String username = String.valueOf(data.getOrDefault("username", ""));
+
+        String displayName = !name.isEmpty() ? name : title;
 
         return switch (log.getAction()) {
             case "CREATE_BATCH" -> "Đã tạo đợt đồ án mới: " + name;
@@ -110,6 +113,9 @@ public class AuditLogService {
                 yield "Đã gán " + count + " sinh viên vào đợt đồ án";
             }
             case "UNASSIGN_STUDENT" -> "Đã gỡ sinh viên khỏi đợt đồ án (Hồ sơ ID: " + log.getEntityId() + ")";
+            case "CREATE_TOPIC" -> "Đã thêm đề tài mới: " + displayName;
+            case "UPDATE_TOPIC" -> "Đã cập nhật đề tài: " + displayName;
+            case "DELETE_TOPIC" -> "Đã xóa đề tài: " + displayName;
             default ->
                 "Thao tác " + log.getAction() + " trên " + log.getEntityType() + " (ID: " + log.getEntityId() + ")";
         };

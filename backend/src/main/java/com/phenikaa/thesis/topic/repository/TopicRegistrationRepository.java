@@ -13,4 +13,8 @@ public interface TopicRegistrationRepository extends JpaRepository<TopicRegistra
     List<TopicRegistration> findByTopicId(UUID topicId);
 
     List<TopicRegistration> findByStudentId(UUID studentId);
+
+    @org.springframework.data.jpa.repository.Query("SELECT tr FROM TopicRegistration tr JOIN tr.topic t WHERE t.proposedBy.id = :userId ORDER BY tr.createdAt DESC")
+    java.util.List<TopicRegistration> findByLecturerId(
+            @org.springframework.data.repository.query.Param("userId") UUID userId);
 }
