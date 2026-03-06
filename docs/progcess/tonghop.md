@@ -185,6 +185,14 @@ GIAI ĐOẠN 1: ĐĂNG KÝ ĐỀ TÀI & THỰC HIỆN ĐỒ ÁN
       └─ Khi sinh viên đạt `READY_FOR_DEFENSE` và được chuyển sang Giai đoạn 2
 ```
 
+
+
+
+
+
+
+
+
 Ví dụ flow thực tế (1 sinh viên – full validate/check):
 
 ```text
