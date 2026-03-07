@@ -237,4 +237,22 @@ public class ThesisService {
 
         return response;
     }
+
+    @Transactional(readOnly = true)
+    public java.util.Map<String, Object> getMyActiveBatch(com.phenikaa.thesis.user.entity.User user) {
+        if (user == null || user.getStudent() == null) {
+            return null;
+        }
+        List<Thesis> theses = thesisRepo.findByStudentIdAndBatchStatus(
+                user.getStudent().getId(),
+                com.phenikaa.thesis.batch.entity.enums.BatchStatus.ACTIVE);
+        if (theses.isEmpty()) {
+            return null;
+        }
+        ThesisBatch batch = theses.get(0).getBatch();
+        java.util.Map<String, Object> result = new java.util.LinkedHashMap<>();
+        result.put("batchId", batch.getId().toString());
+        result.put("batchName", batch.getName());
+        return result;
+    }
 }

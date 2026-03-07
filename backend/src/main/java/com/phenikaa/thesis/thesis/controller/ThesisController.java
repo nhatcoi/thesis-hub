@@ -19,6 +19,16 @@ public class ThesisController {
     private final ThesisService thesisService;
     private final com.phenikaa.thesis.common.util.SecurityUtils securityUtils;
 
+    /**
+     * SV lấy batch hiện tại đang ACTIVE mà mình thuộc về.
+     */
+    @GetMapping("/my-batch")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('STUDENT')")
+    public ApiResponse<java.util.Map<String, Object>> getMyActiveBatch() {
+        com.phenikaa.thesis.user.entity.User user = securityUtils.getCurrentUser();
+        return ApiResponse.ok(thesisService.getMyActiveBatch(user));
+    }
+
     @GetMapping("/advising")
     @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('LECTURER', 'DEPT_HEAD')")
     public ApiResponse<java.util.List<ThesisResponse>> getAdvisingTheses() {

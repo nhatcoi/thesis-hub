@@ -24,4 +24,10 @@ public interface ThesisRepository extends JpaRepository<Thesis, UUID>, JpaSpecif
     java.util.List<Thesis> findByAdvisorId(UUID advisorId);
 
     java.util.List<Thesis> findByTopicId(UUID topicId);
+
+    @org.springframework.data.jpa.repository.Query(
+        "SELECT t FROM Thesis t JOIN FETCH t.batch b WHERE t.student.id = :studentId AND b.status = :batchStatus")
+    java.util.List<Thesis> findByStudentIdAndBatchStatus(
+            @org.springframework.data.repository.query.Param("studentId") UUID studentId,
+            @org.springframework.data.repository.query.Param("batchStatus") com.phenikaa.thesis.batch.entity.enums.BatchStatus batchStatus);
 }
