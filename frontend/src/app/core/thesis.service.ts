@@ -79,4 +79,9 @@ export class ThesisService {
         return this.http.get<{ data: ThesisResponse[] }>(`${this.baseUrl}/advising`)
             .pipe(map(r => r.data));
     }
+
+    getMyActiveBatch(): Observable<{ batchId: string; batchName: string } | null> {
+        return this.http.get<{ data: { batchId: string; batchName: string } | null }>(`${this.baseUrl}/my-batch`)
+            .pipe(map(r => r.data));
+    }
 }

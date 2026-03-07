@@ -11,8 +11,17 @@ export interface TopicRegistration {
     studentName: string;
     studentCode: string;
     status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    topicSource: 'LECTURER' | 'STUDENT';
     rejectReason?: string;
     createdAt: string;
+}
+
+export interface StudentTopicProposal {
+    title: string;
+    description?: string;
+    requirements?: string;
+    batchId: string;
+    preferredLecturerId?: string;
 }
 
 @Injectable({
@@ -26,7 +35,11 @@ export class TopicRegistrationService {
         return this.http.get<any>(`${this.baseUrl}/me`);
     }
 
-    approveRegistration(id: string, req: { status: string; rejectReason?: string }): Observable<any> {
+    getMajorRegistrations(): Observable<any> {
+        return this.http.get<any>(`${this.baseUrl}/major`);
+    }
+
+    approveRegistration(id: string, req: { status: string; rejectReason?: string; advisorId?: string }): Observable<any> {
         return this.http.patch<any>(`${this.baseUrl}/${id}/approve`, req);
     }
 
@@ -34,7 +47,12 @@ export class TopicRegistrationService {
         return this.http.post<any>(this.baseUrl, { topicId });
     }
 
+    proposeTopic(proposal: StudentTopicProposal): Observable<any> {
+        return this.http.post<any>(`${this.baseUrl}/propose`, proposal);
+    }
+
     getMyStudentRegistrations(): Observable<any> {
         return this.http.get<any>(`${this.baseUrl}/my`);
     }
 }
+

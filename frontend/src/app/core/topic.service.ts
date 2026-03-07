@@ -96,10 +96,9 @@ export class TopicService {
         return this.http.get<any>(`${this.baseUrl}/me`, { params: httpParams });
     }
 
-    getAvailableTopics(params: { batchId?: string; majorCode?: string; search?: string } = {}): Observable<{ data: Topic[] }> {
+    getAvailableTopics(params: { batchId?: string; search?: string } = {}): Observable<{ data: Topic[] }> {
         let httpParams = new HttpParams();
         if (params.batchId) httpParams = httpParams.set('batchId', params.batchId);
-        if (params.majorCode) httpParams = httpParams.set('majorCode', params.majorCode);
         if (params.search) httpParams = httpParams.set('search', params.search);
         return this.http.get<any>(`${this.baseUrl}/available`, { params: httpParams });
     }
