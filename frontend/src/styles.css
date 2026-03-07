@@ -69,3 +69,22 @@
     @apply bg-white p-4 hover:bg-gray-50/50 transition-colors;
   }
 }
+
+/* Notification Toast Popup */
+.notification-toast {
+  --mdc-snackbar-container-color: #312e81;
+  --mdc-snackbar-supporting-text-color: #fff;
+  --mat-snack-bar-button-color: #a5b4fc;
+}
+
+.notification-toast .mdc-snackbar__surface {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 40px rgba(79, 70, 229, 0.3) !important;
+  border: 1px solid rgba(165, 180, 252, 0.2) !important;
+}
+
+.notification-toast .mdc-snackbar__label {
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  letter-spacing: -0.02em !important;
+}

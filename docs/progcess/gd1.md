@@ -506,23 +506,19 @@ Tính năng **"Khởi tạo đợt đồ án"** đã được phát triển hoà
   - **JWT** (Bearer token) → tìm User theo `external_id`
 - `AuthController.java` -- Cập nhật `/api/auth/me` để trả thêm `local_user_id` và `local_role` sau khi sync.
 
-**2. ThesisBatch CRUD (cập nhật)**
+**2. ThesisBatch & Student Enhancements (Cập nhật)**
 
-| Endpoint | Method | Role | Chức năng |
-|---|---|---|---|
-| `POST /api/batches` | POST | ADMIN, TRAINING_DEPT | Tạo đợt (DRAFT) |
-| `GET /api/batches` | GET | All authenticated | Danh sách (filter by status) |
-| `GET /api/batches/{id}` | GET | All authenticated | Chi tiết 1 đợt |
-| `PUT /api/batches/{id}` | PUT | ADMIN, TRAINING_DEPT | Sửa (chỉ DRAFT) |
-| `PATCH /api/batches/{id}/activate` | PATCH | ADMIN, TRAINING_DEPT | DRAFT → ACTIVE |
-| `PATCH /api/batches/{id}/close` | PATCH | ADMIN, TRAINING_DEPT | ACTIVE → CLOSED |
-| `DELETE /api/batches/{id}` | DELETE | ADMIN, TRAINING_DEPT | Xoá (chỉ DRAFT) |
+| Tính năng | Backend | Frontend |
+|---|---|---|
+| Mốc thời gian đợt | `TIMESTAMPTZ` / `OffsetDateTime` | `datetime-local`, hiển thị `HH:mm` |
+| Hồ sơ sinh viên | Thêm `class_name` (lớp học) | Hiển thị + form nhập lớp học |
+| UI Giảng viên | API detect active batch | Hiển thị timeline + giới hạn tạo đề tài |
 
-**3. Validation nghiệp vụ trong Service**
-- Kiểm tra ngày bắt đầu < ngày kết thúc cho từng giai đoạn
-- Kiểm tra thứ tự các giai đoạn: ĐK đề tài → Đề cương → Thực hiện → ĐK bảo vệ → Bảo vệ
-- Chỉ cho sửa/xoá khi ở trạng thái `DRAFT`
-- State machine: `DRAFT → ACTIVE → CLOSED`
+**3. Validation & Fixes**
+- Kiểm tra ngày bắt đầu < ngày kết thúc (Time-aware với `OffsetDateTime`)
+- Sửa lỗi fetch roles pagination trong `UserService` (sử dụng `distinct` trong Specification)
+- Sửa lỗi khoảng trắng trong tham số sort frontend (`sort=username,asc`)
+- Chế độ state machine: `DRAFT → ACTIVE → CLOSED`
 
 **4. Response bọc trong `ApiResponse`** -- trả JSON chuẩn `{ success, message, data, timestamp }` cho tất cả API.
 
@@ -578,8 +574,11 @@ APP ROOT
 │
 ├─ Giảng viên
 │  ├─ Quản lý đề tài của tôi
-│  │  ├─ Danh sách đề tài (AVAILABLE / đủ slot / hết slot)
-│  │  ├─ Tạo / sửa / ẩn đề tài
+│  │  ├─ Tự động nhận diện Đợt ĐATN đang hoạt động (ACTIVE)
+│  │  ├─ Hiển thị timeline: Thời gian đăng ký đề tài (giờ:phút)
+│  │  ├─ Trạng thái đăng ký: Đang mở / Chưa mở / Đã kết thúc
+│  │  ├─ Danh sách đề tài: Lọc theo trạng thái, ngành học
+│  │  ├─ Chỉ cho phép "Tạo đề tài mới" khi trong hạn đăng ký
 │  │  └─ Xem số SV đã nhận / còn slot
 │  │
 │  ├─ Yêu cầu đăng ký đề tài
@@ -613,7 +612,8 @@ APP ROOT
 │
 └─ Sinh viên
    ├─ Dashboard đồ án của tôi
-   │  ├─ Thông tin đợt + deadline theo tuần (1–13)
+   │  ├─ Thông tin đợt + mốc thời gian chi tiết (ngày giờ)
+   │  ├─ Timeline các giai đoạn theo tuần (1–13)
    │  ├─ Trạng thái hiện tại:
    │  │  ├─ ELIGIBLE_FOR_THESIS
    │  │  ├─ TOPIC_PENDING_APPROVAL / APPROVED / REJECTED

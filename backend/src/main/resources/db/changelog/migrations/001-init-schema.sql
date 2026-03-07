@@ -99,6 +99,7 @@ CREATE TABLE students (
     student_code        VARCHAR(20) UNIQUE NOT NULL,
     major_id            UUID NOT NULL REFERENCES majors(id),
     cohort              VARCHAR(20) NOT NULL,
+    class_name          VARCHAR(50),
     eligible_for_thesis BOOLEAN DEFAULT FALSE,
     created_at          TIMESTAMPTZ DEFAULT NOW(),
     updated_at          TIMESTAMPTZ DEFAULT NOW()

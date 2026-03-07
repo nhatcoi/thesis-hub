@@ -3,6 +3,7 @@ import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/rou
 import { AuthService, Role } from '../core/auth.service';
 import { NotificationService } from '../core/notification.service';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 
 interface MenuItem {
@@ -55,7 +56,7 @@ const MENU_MAP: Record<string, MenuItem[]> = {
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, MatIconModule, CommonModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, MatIconModule, MatSnackBarModule, CommonModule],
   template: `
     <div class="flex h-screen bg-white">
       <!-- Sidebar -->
@@ -156,6 +157,7 @@ export class LayoutComponent implements OnInit {
   ngOnInit(): void {
     if (this.auth.isLoggedIn()) {
       this.notificationService.loadUnreadCount();
+      this.notificationService.connectWebSocket();
     }
   }
 
@@ -189,6 +191,7 @@ export class LayoutComponent implements OnInit {
   }
 
   logout(): void {
+    this.notificationService.disconnectWebSocket();
     this.auth.logout();
   }
 }

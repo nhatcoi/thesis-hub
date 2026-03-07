@@ -97,6 +97,8 @@ public class UserService {
         String majorName = null;
         UUID userFacultyId = null;
         String majorCode = null;
+        String cohort = null;
+        String className = null;
 
         Set<UserRole> roleCodes = user.getRoles().stream()
                 .map(Role::getCode)
@@ -104,14 +106,18 @@ public class UserService {
 
         if (roleCodes.contains(UserRole.STUDENT)) {
             Student student = studentRepository.findByUserId(user.getId()).orElse(null);
-            if (student != null && student.getMajorCode() != null) {
-                majorCode = student.getMajorCode();
-                Major m = majorRepository.findByCode(majorCode).orElse(null);
-                if (m != null) {
-                    majorName = m.getName();
-                    if (m.getFaculty() != null) {
-                        facultyName = m.getFaculty().getName();
-                        userFacultyId = m.getFaculty().getId();
+            if (student != null) {
+                cohort = student.getCohort();
+                className = student.getClassName();
+                if (student.getMajorCode() != null) {
+                    majorCode = student.getMajorCode();
+                    Major m = majorRepository.findByCode(majorCode).orElse(null);
+                    if (m != null) {
+                        majorName = m.getName();
+                        if (m.getFaculty() != null) {
+                            facultyName = m.getFaculty().getName();
+                            userFacultyId = m.getFaculty().getId();
+                        }
                     }
                 }
             }
@@ -151,10 +157,11 @@ public class UserService {
                 .facultyName(facultyName)
                 .majorName(majorName)
                 .facultyId(userFacultyId)
-                .facultyId(userFacultyId)
                 .managedMajorName(managedMajorName)
                 .majorCode(majorCode)
                 .managedMajorCode(managedMajorCode)
+                .cohort(cohort)
+                .className(className)
                 .build();
     }
 
@@ -207,6 +214,7 @@ public class UserService {
                 .studentCode(user.getUsername())
                 .majorCode(request.getMajorCode())
                 .cohort(request.getCohort())
+                .className(request.getClassName())
                 .eligibleForThesis(Boolean.TRUE)
                 .build();
 

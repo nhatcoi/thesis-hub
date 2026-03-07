@@ -33,6 +33,7 @@ public class UserCreateRequest {
     // Student specific fields
     private String majorCode;
     private String cohort;
+    private String className;
 
     // Lecturer specific fields
     private String facultyCode;

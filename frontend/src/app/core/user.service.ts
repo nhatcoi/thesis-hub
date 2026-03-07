@@ -17,6 +17,7 @@ export interface UserCreateRequest {
     // Student specific
     majorCode?: string;
     cohort?: string;
+    className?: string;
 
     // Lecturer specific
     facultyCode?: string;
@@ -39,6 +40,8 @@ export interface UserResponse {
     majorId?: string;
     managedMajorId?: string;
     managedMajorName?: string;
+    cohort?: string;
+    className?: string;
 }
 
 export interface PageResponse<T> {

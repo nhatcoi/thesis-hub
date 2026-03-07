@@ -29,4 +29,6 @@ public class UserResponse {
     private String managedMajorName;
     private String majorCode;
     private String managedMajorCode;
+    private String cohort;
+    private String className;
 }

@@ -11,11 +11,11 @@ GIAI ĐOẠN 1: ĐĂNG KÝ ĐỀ TÀI & THỰC HIỆN ĐỒ ÁN
 │  ├─ Actor: Phòng Đào tạo, Trường/Khoa/Ngành, Hệ thống
 │  ├─ Nghiệp vụ Phòng Đào tạo
 │  │  ├─ Tạo đợt đồ án mới cấp trường (tên, học kỳ, năm, khóa)
-│  │  └─ Thiết lập khung mốc thời gian chung:
-│  │     ├─ Thời gian đăng ký đề tài
-│  │     ├─ Thời gian nộp đề cương
-│  │     ├─ Thời gian thực hiện đồ án
-│  │     └─ Thời gian đăng ký bảo vệ
+│  │  └─ Thiết lập khung mốc thời gian chi tiết (bao gồm cả giờ/phút - TIMESTAMPTZ):
+│  │     ├─ Thời gian đăng ký đề tài (Start/End)
+│  │     ├─ Thời gian nộp đề cương (Start/End)
+│  │     ├─ Thời gian thực hiện đồ án (Start/End)
+│  │     └─ Thời gian đăng ký bảo vệ (Start/End)
 │  ├─ Nghiệp vụ Trường/Khoa/Ngành
 │  │  └─ (Tùy quy chế) Có thể tinh chỉnh mốc thời gian, quy định chi tiết theo ngành
 │  └─ Nghiệp vụ Hệ thống
@@ -28,7 +28,7 @@ GIAI ĐOẠN 1: ĐĂNG KÝ ĐỀ TÀI & THỰC HIỆN ĐỒ ÁN
 │  ├─ Nghiệp vụ Phòng Đào tạo
 │  │  └─ Import danh sách **toàn bộ sinh viên của khóa** từ hệ thống đào tạo (file, form…)
 │  ├─ Nghiệp vụ Hệ thống
-│  │  ├─ Lưu dữ liệu sinh viên (khoa/ngành, GPA, tín chỉ tích lũy,…)
+│  │  ├─ Lưu dữ liệu sinh viên (khoa/ngành, lớp học, khóa, GPA, tín chỉ tích lũy,…)
 │  │  ├─ Kiểm tra điều kiện làm đồ án (GPA, tín chỉ, nợ môn bắt buộc…)
 │  │  ├─ Gán trạng thái:
 │  │  │  ├─ `ELIGIBLE_FOR_THESIS` nếu đủ điều kiện (ứng viên làm đồ án)

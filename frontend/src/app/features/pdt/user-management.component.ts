@@ -98,7 +98,7 @@ type ImportType = 'STUDENT' | 'LECTURER';
                       <td class="p-3">
                         @if (hasRole(user, 'STUDENT')) {
                           <div class="font-bold text-indigo-700">{{ user.majorName || 'Chưa cập nhật' }}</div>
-                          <div class="text-[10px] text-gray-400">{{ user.facultyName }}</div>
+                          <div class="text-[10px] text-gray-400">{{ user.facultyName }} · {{ user.className || 'Chưa có lớp' }}</div>
                         } @else if (hasRole(user, 'LECTURER') || hasRole(user, 'DEPT_HEAD')) {
                           <div class="font-bold text-indigo-700">{{ user.facultyName || 'Chưa cập nhật' }}</div>
                           @if (hasRole(user, 'DEPT_HEAD')) {
@@ -272,7 +272,7 @@ type ImportType = 'STUDENT' | 'LECTURER';
               @if (form.get('role')?.value === 'STUDENT') {
                 <div class="md:col-span-2 border-t border-gray-50 pt-3">
                   <label class="block text-xs font-bold text-indigo-500 mb-2 italic">Dành cho Sinh viên</label>
-                  <div class="grid grid-cols-2 gap-4">
+                  <div class="grid grid-cols-3 gap-4">
                     <div>
                       <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Ngành học *</label>
                       <select formControlName="majorCode" class="app-select">
@@ -285,6 +285,10 @@ type ImportType = 'STUDENT' | 'LECTURER';
                     <div>
                       <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Khóa</label>
                       <input type="text" formControlName="cohort" class="app-input" placeholder="K17">
+                    </div>
+                    <div>
+                      <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1">Lớp học</label>
+                      <input type="text" formControlName="className" class="app-input" placeholder="KTPM-K17A">
                     </div>
                   </div>
                 </div>
@@ -388,6 +392,7 @@ export class UserManagementComponent implements OnInit {
     role: ['STUDENT', Validators.required],
     majorCode: [''],
     cohort: [''],
+    className: [''],
     facultyCode: [''],
     managedMajorCode: [''],
     maxStudentsPerBatch: [5]

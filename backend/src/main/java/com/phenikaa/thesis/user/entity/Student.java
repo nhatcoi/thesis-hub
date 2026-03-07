@@ -26,6 +26,9 @@ public class Student extends BaseEntity {
     @Column(length = 20, nullable = false)
     private String cohort;
 
+    @Column(name = "class_name", length = 50)
+    private String className;
+
     @Column(name = "eligible_for_thesis")
     private Boolean eligibleForThesis;
 }
