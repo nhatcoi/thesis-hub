@@ -116,6 +116,10 @@ public class AuditLogService {
             case "CREATE_TOPIC" -> "Đã thêm đề tài mới: " + displayName;
             case "UPDATE_TOPIC" -> "Đã cập nhật đề tài: " + displayName;
             case "DELETE_TOPIC" -> "Đã xóa đề tài: " + displayName;
+            case "REGISTER_TOPIC" -> "Đã đăng ký đề tài (FCFS): " + displayName;
+            case "PROPOSE_TOPIC" -> "Đã đề xuất đề tài mới: " + displayName;
+            case "APPROVE_REGISTRATION" -> "Đã duyệt đăng ký đề tài: " + displayName + " cho sinh viên: " + data.get("studentCode");
+            case "REJECT_REGISTRATION" -> "Đã từ chối đăng ký đề tài: " + displayName + " của sinh viên: " + data.get("studentCode");
             default ->
                 "Thao tác " + log.getAction() + " trên " + log.getEntityType() + " (ID: " + log.getEntityId() + ")";
         };
