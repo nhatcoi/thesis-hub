@@ -44,9 +44,9 @@ public class TopicController {
     @PreAuthorize("hasRole('STUDENT')")
     public ApiResponse<List<TopicResponse>> getAvailableTopics(
             @RequestParam(required = false) UUID batchId,
-            @RequestParam(required = false) String majorCode,
             @RequestParam(required = false) String search) {
-        return ApiResponse.ok(topicService.getAvailableTopics(batchId, majorCode, search));
+        User user = getCurrentUser();
+        return ApiResponse.ok(topicService.getAvailableTopics(user, batchId, search));
     }
 
     @GetMapping("/{id}")

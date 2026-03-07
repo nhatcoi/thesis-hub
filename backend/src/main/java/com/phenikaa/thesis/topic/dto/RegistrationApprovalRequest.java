@@ -7,4 +7,5 @@ import lombok.Data;
 public class RegistrationApprovalRequest {
     private RegistrationStatus status;
     private String rejectReason;
+    private java.util.UUID advisorId;
 }

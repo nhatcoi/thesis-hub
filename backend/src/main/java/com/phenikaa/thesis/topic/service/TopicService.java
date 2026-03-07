@@ -70,7 +70,9 @@ public class TopicService {
     }
 
     @Transactional(readOnly = true)
-    public java.util.List<TopicResponse> getAvailableTopics(UUID batchId, String majorCode, String search) {
+    public java.util.List<TopicResponse> getAvailableTopics(User user, UUID batchId, String search) {
+        String majorCode = (user.getStudent() != null) ? user.getStudent().getMajorCode() : null;
+
         org.springframework.data.jpa.domain.Specification<Topic> spec = (root, query, cb) -> {
             java.util.List<jakarta.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
 

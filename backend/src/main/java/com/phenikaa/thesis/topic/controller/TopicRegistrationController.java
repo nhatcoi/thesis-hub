@@ -3,9 +3,11 @@ package com.phenikaa.thesis.topic.controller;
 import com.phenikaa.thesis.common.dto.ApiResponse;
 import com.phenikaa.thesis.common.util.SecurityUtils;
 import com.phenikaa.thesis.topic.dto.RegistrationApprovalRequest;
+import com.phenikaa.thesis.topic.dto.StudentTopicProposalRequest;
 import com.phenikaa.thesis.topic.dto.TopicRegistrationResponse;
 import com.phenikaa.thesis.topic.service.TopicRegistrationService;
 import com.phenikaa.thesis.user.entity.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,6 +32,17 @@ public class TopicRegistrationController {
         return ApiResponse.ok(registrationService.getMyRegistrations(user));
     }
 
+    @GetMapping("/major")
+    @PreAuthorize("hasRole('DEPT_HEAD')")
+    public ApiResponse<List<TopicRegistrationResponse>> getMajorRegistrations() {
+        User user = getCurrentUser();
+        if (user.getLecturer() == null) {
+            return ApiResponse.ok(java.util.List.of());
+        }
+        String majorCode = user.getLecturer().getManagedMajorCode();
+        return ApiResponse.ok(registrationService.getMajorRegistrations(majorCode));
+    }
+
     @GetMapping("/my")
     @PreAuthorize("hasRole('STUDENT')")
     public ApiResponse<List<TopicRegistrationResponse>> getMyStudentRegistrations() {
@@ -44,6 +57,15 @@ public class TopicRegistrationController {
         User user = getCurrentUser();
         UUID topicId = UUID.fromString(body.get("topicId"));
         return ApiResponse.ok(registrationService.registerTopic(user, topicId));
+    }
+
+    @PostMapping("/propose")
+    @PreAuthorize("hasRole('STUDENT')")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<TopicRegistrationResponse> proposeTopic(
+            @Valid @RequestBody StudentTopicProposalRequest request) {
+        User user = getCurrentUser();
+        return ApiResponse.ok(registrationService.proposeTopicByStudent(user, request));
     }
 
     @PatchMapping("/{id}/approve")
