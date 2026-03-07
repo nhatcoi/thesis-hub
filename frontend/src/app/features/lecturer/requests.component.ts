@@ -34,14 +34,21 @@ import { TopicRegistrationService, TopicRegistration } from '../../core/topic-re
                     {{ reg.studentName.substring(0, 1) }}
                   </div>
                   <div>
-                    <h3 class="text-sm font-bold text-gray-900">{{ reg.studentName }}</h3>
+                    <div class="flex items-center gap-2 mb-1">
+                      <h3 class="text-sm font-bold text-gray-900">{{ reg.studentName }}</h3>
+                      @if (reg.topicSource === 'LECTURER') {
+                        <span class="text-[9px] font-black bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded tracking-tighter uppercase italic">Đăng ký (FCFS)</span>
+                      } @else {
+                        <span class="text-[9px] font-black bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded tracking-tighter uppercase italic">Yêu cầu từ SV</span>
+                      }
+                    </div>
                     <div class="flex items-center gap-2 text-[11px] text-gray-500">
                       <span class="font-medium text-indigo-600">{{ reg.studentCode }}</span>
                       <span>•</span>
                       <span>{{ reg.createdAt | date:'HH:mm dd/MM/yyyy' }}</span>
                     </div>
                     <div class="mt-1 text-xs text-gray-600 italic">
-                      Đăng ký: {{ reg.topicTitle }}
+                      Đề tài: {{ reg.topicTitle }}
                     </div>
                   </div>
                 </div>
@@ -56,7 +63,7 @@ import { TopicRegistrationService, TopicRegistration } from '../../core/topic-re
                     </button>
                   } @else {
                     <span [class]="getStatusClass(reg.status)" class="app-badge">
-                      {{ reg.status === 'APPROVED' ? 'Đã duyệt' : 'Đã từ chối' }}
+                      {{ reg.status === 'APPROVED' ? 'Đã duyệt' : (reg.status === 'REJECTED' ? 'Đã từ chối' : reg.status) }}
                     </span>
                   }
                 </div>
