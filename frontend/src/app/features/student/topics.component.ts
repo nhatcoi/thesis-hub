@@ -16,7 +16,7 @@ import { StudentProposalDialogComponent } from './student-proposal-dialog.compon
   template: `
     <div class="space-y-4">
       <!-- Header -->
-      <div class="app-section-header">
+      <div class="app-section-header flex items-center justify-between">
         <div>
           <h2 class="app-title">
             @if (myBatchId()) {
@@ -25,16 +25,28 @@ import { StudentProposalDialogComponent } from './student-proposal-dialog.compon
               Đăng ký đề tài
             }
           </h2>
-          <p class="app-subtitle italic">
+          <p class="app-subtitle italic flex flex-wrap items-center gap-x-4 gap-y-1">
             @if (myBatchId()) {
-              Dưới đây là danh sách đề tài sẵn có phù hợp với bạn.
+              <span>Dưới đây là danh sách đề tài sẵn có phù hợp với bạn.</span>
+              @if (topicRegStart() && topicRegEnd()) {
+                <span class="flex items-center gap-1.5 text-indigo-500 font-bold bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100/50 font-mono">
+                  <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">event</mat-icon>
+                  Thời gian: {{ topicRegStart() | date:'dd/MM/yyyy HH:mm' }} - {{ topicRegEnd() | date:'dd/MM/yyyy HH:mm' }}
+                </span>
+                @if (isRegEnded()) {
+                  <span class="flex items-center gap-1 text-red-500 font-black uppercase tracking-tighter">
+                    <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">alarm_off</mat-icon>
+                    (Đã kết thúc)
+                  </span>
+                }
+              }
             } @else {
               Tìm kiếm và đăng ký đề tài đồ án tốt nghiệp từ danh sách các đề tài có sẵn.
             }
           </p>
         </div>
-        @if (myBatchId()) {
-          <button (click)="openProposalDialog()" class="app-btn-primary">
+        @if (myBatchId() && !hasActiveRegistration() && !isRegEnded() && !isBeforeReg()) {
+          <button (click)="openProposalDialog()" class="app-btn-primary animate-in zoom-in-95 duration-200">
             <mat-icon class="!text-sm">add</mat-icon>
             Đề xuất đề tài mới
           </button>
@@ -119,7 +131,7 @@ import { StudentProposalDialogComponent } from './student-proposal-dialog.compon
                         <div class="flex-grow min-w-0">
                           <h3 class="text-sm font-bold text-gray-900 leading-snug">{{ topic.title }}</h3>
                           <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[11px] text-gray-500">
-                            <span class="flex items-center gap-1"><mat-icon class="!text-xs">person</mat-icon> {{ topic.proposedByName }}</span>
+                            <span class="flex items-center gap-1"><mat-icon class="!text-xs">person</mat-icon> GVHD: {{ topic.proposedByName }}</span>
                             @if (topic.majorName) {
                               <span class="bg-gray-100 px-1.5 py-0.5 rounded">{{ topic.majorName }}</span>
                             }
@@ -143,7 +155,13 @@ import { StudentProposalDialogComponent } from './student-proposal-dialog.compon
                           <div class="text-[11px] text-gray-400">{{ topic.currentStudents }}/{{ topic.maxStudents }} SV</div>
                           
                           @if (isAlreadyRegistered(topic.id)) {
-                            <button disabled class="app-btn-secondary w-full justify-center !text-gray-400 bg-gray-50">Đã đăng ký</button>
+                            <button disabled class="app-btn-secondary w-full justify-center !text-indigo-600 bg-indigo-50 border-indigo-100">Đã đăng ký</button>
+                          } @else if (hasActiveRegistration()) {
+                            <button disabled class="app-btn-secondary w-full justify-center !text-gray-400 bg-gray-50">Đã đăng ký đề tài khác</button>
+                          } @else if (isBeforeReg()) {
+                            <button disabled class="app-btn-secondary w-full justify-center !text-amber-600 bg-amber-50 border-amber-100">Chưa đến hạn</button>
+                          } @else if (isRegEnded()) {
+                            <button disabled class="app-btn-secondary w-full justify-center !text-red-500 bg-red-50 border-red-100">Đã hết hạn</button>
                           } @else if (getSlotsRemaining(topic) > 0) {
                             <button (click)="registerForTopic(topic)" [disabled]="registering()" class="app-btn-primary w-full justify-center">Đăng ký</button>
                           }
@@ -171,20 +189,53 @@ import { StudentProposalDialogComponent } from './student-proposal-dialog.compon
               } @else {
                 <div class="app-list-container">
                   @for (reg of myRegistrations(); track reg.id) {
-                    <div class="app-list-item">
-                      <div class="flex flex-col sm:flex-row items-start justify-between gap-4">
-                        <div>
-                          <h3 class="text-sm font-bold text-gray-900">{{ reg.topicTitle }}</h3>
-                          <p class="text-[11px] text-gray-400 mt-0.5">Ngày gửi: {{ reg.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
-                          @if (reg.rejectReason) {
-                            <div class="mt-2 bg-red-50 text-[11px] text-red-700 px-2 py-1 rounded border border-red-100">
-                              <span class="font-bold">Từ chối:</span> {{ reg.rejectReason }}
+                    <div class="app-list-item !p-5">
+                      <div class="flex flex-col md:flex-row justify-between gap-6">
+                        <div class="flex-grow space-y-3">
+                          <div class="flex items-center gap-3">
+                            <span [class]="getRegStatusClass(reg.status)" class="app-badge">
+                              {{ getRegStatusLabel(reg.status) }}
+                            </span>
+                            <span class="text-[11px] text-gray-400">Ngày gửi: {{ reg.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                          </div>
+
+                          <div class="space-y-4">
+                            <div>
+                              <h3 class="text-lg font-bold text-gray-900 leading-tight">{{ reg.topicTitle }}</h3>
+                              @if (reg.advisorName) {
+                                <div class="flex items-center gap-1.5 text-indigo-600 font-bold text-[11px] mt-1.5 uppercase tracking-wide">
+                                  <mat-icon class="!w-4 !h-4 !text-[16px]">person</mat-icon>
+                                  GVHD: {{ reg.advisorName }}
+                                </div>
+                              }
                             </div>
-                          }
+
+                            @if (reg.topicDescription) {
+                              <div class="bg-gray-50/80 p-4 rounded-xl border border-gray-100/50">
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Mô tả chi tiết</span>
+                                <p class="text-xs text-gray-600 leading-relaxed whitespace-pre-line">{{ reg.topicDescription }}</p>
+                              </div>
+                            }
+
+                            @if (reg.topicRequirements) {
+                              <div class="flex items-start gap-2">
+                                <div class="bg-amber-50 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-100 uppercase">
+                                  Yêu cầu: {{ reg.topicRequirements }}
+                                </div>
+                              </div>
+                            }
+
+                            @if (reg.rejectReason) {
+                              <div class="bg-red-50 p-4 rounded-xl border border-red-100 flex gap-3 items-start">
+                                <mat-icon class="text-red-500 !text-lg mt-0.5">warning</mat-icon>
+                                <div class="text-xs text-red-700 leading-relaxed">
+                                  <span class="font-bold uppercase tracking-wider block mb-0.5">Lý do từ chối</span>
+                                  {{ reg.rejectReason }}
+                                </div>
+                              </div>
+                            }
+                          </div>
                         </div>
-                        <span [class]="getRegStatusClass(reg.status)" class="app-badge shrink-0">
-                          {{ getRegStatusLabel(reg.status) }}
-                        </span>
                       </div>
                     </div>
                   }
@@ -212,8 +263,12 @@ export class TopicsComponent implements OnInit {
   loadingRegistrations = signal(true);
   registering = signal(false);
 
+  hasActiveRegistration = signal(false);
+
   myBatchId = signal<string | null>(null);
   myBatchName = signal<string>('');
+  topicRegStart = signal<string | null>(null);
+  topicRegEnd = signal<string | null>(null);
 
   searchText = '';
   private searchTimeout: any;
@@ -231,6 +286,8 @@ export class TopicsComponent implements OnInit {
         if (batch && batch.batchId) {
           this.myBatchId.set(batch.batchId);
           this.myBatchName.set(batch.batchName);
+          this.topicRegStart.set(batch.topicRegStart);
+          this.topicRegEnd.set(batch.topicRegEnd);
           this.loadTopics();
         } else {
           this.myBatchId.set(null);
@@ -244,6 +301,18 @@ export class TopicsComponent implements OnInit {
         this.loading.set(false);
       }
     });
+  }
+
+  isRegEnded(): boolean {
+    if (!this.topicRegEnd()) return false;
+    const end = new Date(this.topicRegEnd()!);
+    return new Date() > end;
+  }
+
+  isBeforeReg(): boolean {
+    if (!this.topicRegStart()) return false;
+    const start = new Date(this.topicRegStart()!);
+    return new Date() < start;
   }
 
   loadTopics(): void {
@@ -271,7 +340,13 @@ export class TopicsComponent implements OnInit {
     this.loadingRegistrations.set(true);
     this.regService.getMyStudentRegistrations().subscribe({
       next: (res: any) => {
-        this.myRegistrations.set(res.data || []);
+        const data = res.data || [];
+        this.myRegistrations.set(data);
+        
+        // Check if student has an active/pending/approved registration in this batch
+        const active = data.some((r: any) => r.status === 'APPROVED' || r.status === 'PENDING');
+        this.hasActiveRegistration.set(active);
+
         this.loadingRegistrations.set(false);
       },
       error: () => this.loadingRegistrations.set(false)
@@ -313,9 +388,9 @@ export class TopicsComponent implements OnInit {
 
   getRegStatusLabel(status: string): string {
     switch (status) {
-      case 'PENDING': return 'Chờ duyệt';
-      case 'APPROVED': return 'Đã duyệt';
-      case 'REJECTED': return 'Từ chối';
+      case 'PENDING': return 'CHỜ DUYỆT';
+      case 'APPROVED': return 'ĐÃ DUYỆT';
+      case 'REJECTED': return 'BỊ TỪ CHỐI';
       default: return status;
     }
   }

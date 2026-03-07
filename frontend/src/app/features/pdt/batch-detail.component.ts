@@ -89,9 +89,9 @@ import { BatchService, ThesisBatch, BatchStatus } from '../../core/batch.service
                       <p class="text-[10px] text-gray-500 mt-0.5 italic">Thời gian giảng viên công bố & sinh viên lựa chọn.</p>
                     </div>
                     <div class="text-right font-mono text-[10px] font-bold text-indigo-600 leading-tight flex flex-col items-end">
-                      <span>{{ b.topicRegStart | date:'dd/MM' }}</span>
+                      <span>{{ b.topicRegStart | date:'dd/MM HH:mm' }}</span>
                       <span class="text-[9px] text-gray-300">|</span>
-                      <span>{{ b.topicRegEnd | date:'dd/MM' }}</span>
+                      <span>{{ b.topicRegEnd | date:'dd/MM HH:mm' }}</span>
                     </div>
                   </div>
                 </div>
@@ -107,9 +107,9 @@ import { BatchService, ThesisBatch, BatchStatus } from '../../core/batch.service
                       <p class="text-[10px] text-gray-500 mt-0.5 italic">Giai đoạn định hướng nội dung và phê duyệt.</p>
                     </div>
                     <div class="text-right font-mono text-[10px] font-bold text-blue-600 leading-tight flex flex-col items-end">
-                      <span>{{ b.outlineStart | date:'dd/MM' }}</span>
+                      <span>{{ b.outlineStart | date:'dd/MM HH:mm' }}</span>
                       <span class="text-[9px] text-gray-300">|</span>
-                      <span>{{ b.outlineEnd | date:'dd/MM' }}</span>
+                      <span>{{ b.outlineEnd | date:'dd/MM HH:mm' }}</span>
                     </div>
                   </div>
                 </div>
@@ -125,9 +125,9 @@ import { BatchService, ThesisBatch, BatchStatus } from '../../core/batch.service
                       <p class="text-[10px] text-gray-500 mt-0.5 italic">Giai đoạn code, thí nghiệm và viết báo cáo.</p>
                     </div>
                     <div class="text-right font-mono text-[10px] font-bold text-green-600 leading-tight flex flex-col items-end">
-                      <span>{{ b.implementationStart | date:'dd/MM' }}</span>
+                      <span>{{ b.implementationStart | date:'dd/MM HH:mm' }}</span>
                       <span class="text-[9px] text-gray-300">|</span>
-                      <span>{{ b.implementationEnd | date:'dd/MM' }}</span>
+                      <span>{{ b.implementationEnd | date:'dd/MM HH:mm' }}</span>
                     </div>
                   </div>
                 </div>
@@ -143,9 +143,9 @@ import { BatchService, ThesisBatch, BatchStatus } from '../../core/batch.service
                       <p class="text-[10px] text-gray-500 mt-0.5 italic">Đăng ký điều kiện đủ tư cách ra hội đồng.</p>
                     </div>
                     <div class="text-right font-mono text-[10px] font-bold text-orange-600 leading-tight flex flex-col items-end">
-                      <span>{{ b.defenseRegStart | date:'dd/MM' }}</span>
+                      <span>{{ b.defenseRegStart | date:'dd/MM HH:mm' }}</span>
                       <span class="text-[9px] text-gray-300">|</span>
-                      <span>{{ b.defenseRegEnd | date:'dd/MM' }}</span>
+                      <span>{{ b.defenseRegEnd | date:'dd/MM HH:mm' }}</span>
                     </div>
                   </div>
                 </div>
@@ -162,9 +162,9 @@ import { BatchService, ThesisBatch, BatchStatus } from '../../core/batch.service
                         <p class="text-[10px] text-gray-500 mt-0.5 italic">Lịch biểu bảo vệ chính thức của khoa/viện.</p>
                       </div>
                       <div class="text-right font-mono text-[10px] font-bold text-red-600 leading-tight flex flex-col items-end">
-                        <span>{{ b.defenseStart | date:'dd/MM' }}</span>
+                        <span>{{ b.defenseStart | date:'dd/MM HH:mm' }}</span>
                         <span class="text-[9px] text-gray-300">|</span>
-                        <span>{{ b.defenseEnd | date:'dd/MM' }}</span>
+                        <span>{{ b.defenseEnd | date:'dd/MM HH:mm' }}</span>
                       </div>
                     </div>
                   </div>

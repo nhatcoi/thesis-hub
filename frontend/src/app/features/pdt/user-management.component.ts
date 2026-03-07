@@ -415,7 +415,7 @@ export class UserManagementComponent implements OnInit {
       role: this.roleFilter,
       facultyId: this.facultyFilter,
       majorCode: this.majorFilter,
-      sort: `${this.sortBy()}, ${this.sortDir()}`
+      sort: `${this.sortBy()},${this.sortDir()}`
     }).subscribe({
       next: (res: PageResponse<UserResponse>) => {
         this.users.set(res.content);

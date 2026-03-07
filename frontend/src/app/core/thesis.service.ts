@@ -80,8 +80,18 @@ export class ThesisService {
             .pipe(map(r => r.data));
     }
 
-    getMyActiveBatch(): Observable<{ batchId: string; batchName: string } | null> {
-        return this.http.get<{ data: { batchId: string; batchName: string } | null }>(`${this.baseUrl}/my-batch`)
+    getMyActiveBatch(): Observable<{ 
+        batchId: string; 
+        batchName: string;
+        topicRegStart: string;
+        topicRegEnd: string;
+    } | null> {
+        return this.http.get<{ data: { 
+            batchId: string; 
+            batchName: string;
+            topicRegStart: string;
+            topicRegEnd: string;
+        } | null }>(`${this.baseUrl}/my-batch`)
             .pipe(map(r => r.data));
     }
 }

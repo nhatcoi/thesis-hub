@@ -7,6 +7,9 @@ export interface TopicRegistration {
     id: string;
     topicId: string;
     topicTitle: string;
+    topicDescription?: string;
+    topicRequirements?: string;
+    advisorName?: string;
     studentId: string;
     studentName: string;
     studentCode: string;

@@ -67,9 +67,9 @@ import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
                     <div class="text-[10px] text-gray-400">Học kỳ {{ batch.semester }}</div>
                   </td>
                   <td class="p-3">
-                    <div class="text-[10px] text-gray-500 leading-normal">
-                      <div>Đăng ký: {{ batch.topicRegStart | date:'dd/MM' }} - {{ batch.topicRegEnd | date:'dd/MM' }}</div>
-                      <div>Thực hiện: {{ batch.implementationStart | date:'dd/MM' }} - {{ batch.implementationEnd | date:'dd/MM' }}</div>
+                    <div class="text-[10px] text-gray-500 leading-normal font-mono">
+                      <div>Đăng ký: {{ batch.topicRegStart | date:'dd/MM HH:mm' }} - {{ batch.topicRegEnd | date:'dd/MM HH:mm' }}</div>
+                      <div>Thực hiện: {{ batch.implementationStart | date:'dd/MM HH:mm' }} - {{ batch.implementationEnd | date:'dd/MM HH:mm' }}</div>
                     </div>
                   </td>
                   <td class="p-3">

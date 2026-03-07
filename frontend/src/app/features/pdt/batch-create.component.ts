@@ -67,11 +67,11 @@ import { BatchService, AcademicYear } from '../../core/batch.service';
                  <div class="grid grid-cols-2 gap-2">
                     <div>
                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Bắt đầu</label>
-                       <input type="date" formControlName="topicRegStart" class="app-input !py-1.5 !text-[11px] font-mono" />
+                       <input type="datetime-local" formControlName="topicRegStart" class="app-input !py-1.5 !text-[11px] font-mono" />
                     </div>
                     <div>
                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Kết thúc</label>
-                       <input type="date" formControlName="topicRegEnd" class="app-input !py-1.5 !text-[11px] font-mono" />
+                       <input type="datetime-local" formControlName="topicRegEnd" class="app-input !py-1.5 !text-[11px] font-mono" />
                     </div>
                  </div>
               </div>
@@ -84,11 +84,11 @@ import { BatchService, AcademicYear } from '../../core/batch.service';
                  <div class="grid grid-cols-2 gap-2">
                     <div>
                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Bắt đầu</label>
-                       <input type="date" formControlName="outlineStart" class="app-input !py-1.5 !text-[11px] font-mono" />
+                       <input type="datetime-local" formControlName="outlineStart" class="app-input !py-1.5 !text-[11px] font-mono" />
                     </div>
                     <div>
                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Kết thúc</label>
-                       <input type="date" formControlName="outlineEnd" class="app-input !py-1.5 !text-[11px] font-mono" />
+                       <input type="datetime-local" formControlName="outlineEnd" class="app-input !py-1.5 !text-[11px] font-mono" />
                     </div>
                  </div>
               </div>
@@ -101,11 +101,11 @@ import { BatchService, AcademicYear } from '../../core/batch.service';
                  <div class="grid grid-cols-2 gap-2">
                     <div>
                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Bắt đầu</label>
-                       <input type="date" formControlName="implementationStart" class="app-input !py-1.5 !text-[11px] font-mono" />
+                       <input type="datetime-local" formControlName="implementationStart" class="app-input !py-1.5 !text-[11px] font-mono" />
                     </div>
                     <div>
                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Kết thúc</label>
-                       <input type="date" formControlName="implementationEnd" class="app-input !py-1.5 !text-[11px] font-mono" />
+                       <input type="datetime-local" formControlName="implementationEnd" class="app-input !py-1.5 !text-[11px] font-mono" />
                     </div>
                  </div>
               </div>
@@ -118,11 +118,11 @@ import { BatchService, AcademicYear } from '../../core/batch.service';
                  <div class="grid grid-cols-2 gap-2">
                     <div>
                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Bắt đầu</label>
-                       <input type="date" formControlName="defenseRegStart" class="app-input !py-1.5 !text-[11px] font-mono" />
+                       <input type="datetime-local" formControlName="defenseRegStart" class="app-input !py-1.5 !text-[11px] font-mono" />
                     </div>
                     <div>
                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Kết thúc</label>
-                       <input type="date" formControlName="defenseRegEnd" class="app-input !py-1.5 !text-[11px] font-mono" />
+                       <input type="datetime-local" formControlName="defenseRegEnd" class="app-input !py-1.5 !text-[11px] font-mono" />
                     </div>
                  </div>
               </div>
@@ -135,11 +135,11 @@ import { BatchService, AcademicYear } from '../../core/batch.service';
                  <div class="grid grid-cols-2 gap-3">
                     <div>
                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Từ ngày</label>
-                       <input type="date" formControlName="defenseStart" class="app-input !py-1.5 !text-[11px] font-mono" />
+                       <input type="datetime-local" formControlName="defenseStart" class="app-input !py-1.5 !text-[11px] font-mono" />
                     </div>
                     <div>
                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Đến ngày</label>
-                       <input type="date" formControlName="defenseEnd" class="app-input !py-1.5 !text-[11px] font-mono" />
+                       <input type="datetime-local" formControlName="defenseEnd" class="app-input !py-1.5 !text-[11px] font-mono" />
                     </div>
                  </div>
               </div>
@@ -204,7 +204,28 @@ export class BatchCreateComponent implements OnInit {
          return;
       }
 
-      const v = this.form.value;
+      const v = { ...this.form.value };
+      
+      // Convert browser local time (YYYY-MM-DDTHH:mm) to ISO with offset
+      const formatDateToISO = (val: string) => { // ts (ID: c8c672b1-6a01-4433-899e-71bd1f0340b1)
+         if (!val) return val;
+         // input type="datetime-local" gives "YYYY-MM-DDTHH:mm"
+         // We convert it to a full ISO string (with timezone offset)
+         return new Date(val).toISOString();
+      };
+
+      const fieldsToFormat = [
+         'topicRegStart', 'topicRegEnd', 
+         'outlineStart', 'outlineEnd', 
+         'implementationStart', 'implementationEnd', 
+         'defenseRegStart', 'defenseRegEnd', 
+         'defenseStart', 'defenseEnd'
+      ];
+      
+      fieldsToFormat.forEach(f => {
+         if (v[f]) v[f] = formatDateToISO(v[f]);
+      });
+
       const msg = this.validateDates(v);
       if (msg) {
          this.serverError.set(msg);
@@ -230,17 +251,18 @@ export class BatchCreateComponent implements OnInit {
    }
 
    private validateDates(v: any): string | null {
-      // Simple logic mirrors backend business rules
-      if (v.topicRegStart >= v.topicRegEnd) return 'Ngày bắt đầu ĐK đề tài không hợp lệ.';
-      if (v.topicRegEnd >= v.outlineStart) return 'Giai đoạn ĐK đề tài phải xong trước khi bắt đầu Đề cương.';
-      if (v.outlineStart >= v.outlineEnd) return 'Ngày bắt đầu nộp đề cương không hợp lệ.';
-      if (v.outlineEnd >= v.implementationStart) return 'Giai đoạn Đề cương phải xong trước khi bắt đầu Thực hiện.';
-      if (v.implementationStart >= v.implementationEnd) return 'Ngày bắt đầu thực hiện không hợp lệ.';
-      if (v.implementationEnd >= v.defenseRegStart) return 'Giai đoạn Thực hiện phải xong trước khi ĐK Bảo vệ.';
-      if (v.defenseRegStart >= v.defenseRegEnd) return 'Ngày bắt đầu ĐK bảo vệ không hợp lệ.';
+      const getT = (val: string | null | undefined) => val ? new Date(val).getTime() : 0;
 
-      if (v.defenseStart && v.defenseEnd && v.defenseStart >= v.defenseEnd) return 'Ngày bảo vệ không hợp lệ.';
-      if (v.defenseStart && v.defenseRegEnd >= v.defenseStart) return 'Hạn ĐK bảo vệ phải đóng trước ngày diễn ra hội đồng.';
+      if (getT(v.topicRegStart) >= getT(v.topicRegEnd)) return 'Thời gian bắt đầu ĐK đề tài không hợp lệ.';
+      if (getT(v.topicRegEnd) >= getT(v.outlineStart)) return 'Giai đoạn ĐK đề tài phải xong trước khi bắt đầu Đề cương.';
+      if (getT(v.outlineStart) >= getT(v.outlineEnd)) return 'Thời gian bắt đầu nộp đề cương không hợp lệ.';
+      if (getT(v.outlineEnd) >= getT(v.implementationStart)) return 'Giai đoạn Đề cương phải xong trước khi bắt đầu Thực hiện.';
+      if (getT(v.implementationStart) >= getT(v.implementationEnd)) return 'Thời gian bắt đầu thực hiện không hợp lệ.';
+      if (getT(v.implementationEnd) >= getT(v.defenseRegStart)) return 'Giai đoạn Thực hiện phải xong trước khi ĐK Bảo vệ.';
+      if (getT(v.defenseRegStart) >= getT(v.defenseRegEnd)) return 'Thời gian bắt đầu ĐK bảo vệ không hợp lệ.';
+
+      if (v.defenseStart && v.defenseEnd && getT(v.defenseStart) >= getT(v.defenseEnd)) return 'Thời gian bảo vệ không hợp lệ.';
+      if (v.defenseStart && getT(v.defenseRegEnd) >= getT(v.defenseStart)) return 'Hạn ĐK bảo vệ phải đóng trước ngày diễn ra hội đồng.';
 
       return null;
    }
