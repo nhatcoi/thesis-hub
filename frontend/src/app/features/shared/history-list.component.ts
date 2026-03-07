@@ -9,89 +9,88 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CommonModule, MatIconModule],
   template: `
-    <div class="max-w-4xl mx-auto space-y-6">
-      <!-- Header Area -->
-      <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+    <div class="space-y-4">
+      <!-- Header -->
+      <div class="app-section-header">
         <div>
-          <h2 class="text-2xl font-bold text-gray-900">
-            {{ isGlobal() ? 'Lịch sử hệ thống' : 'Lịch sử cá nhân' }}
+          <h2 class="app-title lowercase first-letter:uppercase">
+            {{ isGlobal() ? 'Lịch sử hệ thống' : 'Lịch sử của tôi' }}
           </h2>
-          <p class="text-sm text-gray-500">
-            {{ isGlobal() ? 'Xem toàn bộ biến động dữ liệu trên hệ thống.' : 'Xem lại các thao tác bạn đã thực hiện gần đây.' }}
+          <p class="app-subtitle italic">
+            {{ isGlobal() ? 'Xem toàn bộ biến động dữ liệu trên toàn bộ hệ thống đồ án.' : 'Xem lại các thao tác và thay đổi bạn đã thực hiện gần đây.' }}
           </p>
         </div>
-        <button (click)="refresh()" 
-          class="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg font-medium transition-all text-sm">
-          <mat-icon [class.animate-spin]="loading()" class="!text-[20px]">refresh</mat-icon>
-          Làm mới
+        <button (click)="refresh()" class="app-btn-secondary !bg-white">
+          <mat-icon [class.animate-spin]="loading()" class="!text-sm">refresh</mat-icon>
+          Cập nhật
         </button>
       </div>
 
-      <!-- Content Area -->
-      @if (loading()) {
-        <div class="flex justify-center py-12">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-        </div>
-      } @else if (history().length === 0) {
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center animate-in fade-in zoom-in-95">
-          <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <mat-icon class="text-gray-300 !text-[32px]">history_toggle_off</mat-icon>
+      <!-- Main Content -->
+      <div class="app-card !p-0 overflow-hidden">
+        @if (loading()) {
+          <div class="flex justify-center py-10">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
           </div>
-          <h3 class="text-lg font-medium text-gray-900">Không có dữ liệu lịch sử</h3>
-          <p class="text-gray-500 mt-1">Các thao tác trên hệ thống dành cho bạn sẽ được ghi nhận tại đây.</p>
-        </div>
-      } @else {
-        <div class="space-y-3">
-          @for (log of history(); track log.id) {
-            <div
-              class="group relative bg-white rounded-xl shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-md animate-in fade-in slide-in-from-bottom-2">
-              
-              <div class="p-4 sm:p-5 flex items-start space-x-4">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
-                  [ngClass]="getBgColor(log.action)">
-                  <mat-icon [ngClass]="getIconColor(log.action)" class="!text-[20px]">
-                    {{ getIcon(log.action) }}
-                  </mat-icon>
-                </div>
-                
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center justify-between mb-1">
-                    <div class="flex items-center gap-2">
-                      <span class="inline-block px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-tight border"
+        } @else if (history().length === 0) {
+          <div class="p-12 text-center">
+            <div class="mx-auto w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center mb-4">
+              <mat-icon class="text-gray-300">history_toggle_off</mat-icon>
+            </div>
+            <h3 class="text-sm font-bold text-gray-900">Không có dữ liệu</h3>
+            <p class="text-xs text-gray-400 mt-1 italic">Chưa ghi nhận thao tác nào từ tài khoản này.</p>
+          </div>
+        } @else {
+          <div class="app-list-container !border-0 !rounded-none">
+            @for (log of history(); track log.id) {
+              <div class="app-list-item !border-x-0 first:!border-t-0 hover:bg-gray-50/50 transition-colors">
+                <div class="flex items-start gap-4">
+                  <!-- Action Icon Dot -->
+                  <div class="mt-1 w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                    [ngClass]="getBgColor(log.action)">
+                    <mat-icon [ngClass]="getIconColor(log.action)" class="!text-lg">
+                      {{ getIcon(log.action) }}
+                    </mat-icon>
+                  </div>
+
+                  <div class="flex-grow min-w-0">
+                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                      <span class="app-badge !text-[9px] !px-1.5 !font-black uppercase tracking-tighter"
                         [ngClass]="getBadgeStyles(log.action)">
                         {{ log.action }}
                       </span>
                       @if (isGlobal()) {
-                        <span class="text-xs font-semibold text-gray-500">• {{ log.userName }}</span>
+                        <span class="text-[11px] font-bold text-gray-900">{{ log.userName }}</span>
+                      }
+                      <span class="text-[10px] font-mono text-gray-400 ml-auto">{{ log.createdAt | date:'HH:mm dd/MM/yyyy' }}</span>
+                    </div>
+
+                    <p class="text-xs text-gray-700 leading-relaxed font-medium">
+                      {{ log.message }}
+                    </p>
+
+                    <div class="mt-2 flex items-center gap-3">
+                      <span class="text-[10px] text-gray-400 italic flex items-center gap-1">
+                        <mat-icon class="!text-[12px]">category</mat-icon>
+                        {{ log.entityType }}
+                      </span>
+                      @if (log.entityId) {
+                        <span class="text-[10px] text-gray-400 italic flex items-center gap-1">
+                          <mat-icon class="!text-[12px]">fingerprint</mat-icon>
+                          {{ log.entityId.substring(0, 8) }}...
+                        </span>
+                      }
+                      @if (log.ipAddress) {
+                        <span class="text-[10px] text-gray-300 ml-auto font-mono">IP: {{ log.ipAddress }}</span>
                       }
                     </div>
-                    <span class="text-[11px] text-gray-400 whitespace-nowrap ml-2">
-                      {{ log.createdAt | date:'dd/MM/yyyy HH:mm' }}
-                    </span>
-                  </div>
-                  
-                  <p class="text-[14px] text-gray-700 font-medium leading-relaxed">
-                    {{ log.message }}
-                  </p>
-                  
-                  <div class="mt-2 flex items-center gap-3">
-                    <span class="text-[11px] font-medium text-gray-400 flex items-center gap-1">
-                      <mat-icon class="!text-[12px]">category</mat-icon>
-                      {{ log.entityType }}
-                    </span>
-                    @if (log.entityId) {
-                      <span class="text-[11px] font-medium text-gray-400 flex items-center gap-1">
-                        <mat-icon class="!text-[12px]">fingerprint</mat-icon>
-                        {{ log.entityId.substring(0, 8) }}...
-                      </span>
-                    }
                   </div>
                 </div>
               </div>
-            </div>
-          }
-        </div>
-      }
+            }
+          </div>
+        }
+      </div>
     </div>
   `
 })
@@ -104,8 +103,8 @@ export class HistoryListComponent implements OnInit {
   isGlobal = signal(false);
 
   ngOnInit(): void {
-    // Every history page now defaults to personal history
-    this.isGlobal.set(false);
+    // Determine if we should show global or personal history based on the URL
+    this.isGlobal.set(this.router.url.includes('/pdt/'));
     this.refresh();
   }
 
