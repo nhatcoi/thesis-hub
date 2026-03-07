@@ -28,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -107,13 +106,13 @@ public class TopicRegistrationService {
             throw new BusinessException("Đợt đồ án \"" + batch.getName() + "\" hiện không hoạt động. Không thể đăng ký.");
         }
 
-        // ── 5. Phải trong thời hạn đăng ký đề tài (topicRegStart ≤ hôm nay ≤ topicRegEnd) ──
-        LocalDate today = LocalDate.now();
-        if (today.isBefore(batch.getTopicRegStart())) {
-            throw new BusinessException("Chưa đến thời hạn đăng ký đề tài. Đăng ký mở từ ngày " + batch.getTopicRegStart() + ".");
+        // ── 5. Phải trong thời hạn đăng ký đề tài (topicRegStart ≤ hiện tại ≤ topicRegEnd) ──
+        OffsetDateTime now = OffsetDateTime.now();
+        if (now.isBefore(batch.getTopicRegStart())) {
+            throw new BusinessException("Chưa đến thời hạn đăng ký đề tài. Đăng ký mở từ: " + batch.getTopicRegStart() + ".");
         }
-        if (today.isAfter(batch.getTopicRegEnd())) {
-            throw new BusinessException("Đã hết thời hạn đăng ký đề tài. Hạn chót là ngày " + batch.getTopicRegEnd() + ".");
+        if (now.isAfter(batch.getTopicRegEnd())) {
+            throw new BusinessException("Đã hết thời hạn đăng ký đề tài. Hạn chót là: " + batch.getTopicRegEnd() + ".");
         }
 
         // ── 6. Đề tài phải ở trạng thái cho phép đăng ký (AVAILABLE / APPROVED) ──
@@ -161,10 +160,10 @@ public class TopicRegistrationService {
                     + "Trạng thái hiện tại: " + thesis.getStatus() + ".");
         }
 
-        // ── 12. SV chưa có registration APPROVED trong cùng BATCH ──
-        if (registrationRepo.existsByStudentIdAndStatusAndBatchId(
-                student.getId(), RegistrationStatus.APPROVED, batch.getId())) {
-            throw new BusinessException("Bạn đã có đăng ký được xác nhận trong đợt này. Không thể đăng ký thêm.");
+        // ── 12. SV chưa có registration APPROVED hoặc PENDING trong cùng BATCH ──
+        if (registrationRepo.existsByStudentIdAndStatusAndBatchId(student.getId(), RegistrationStatus.APPROVED, batch.getId())
+                || registrationRepo.existsByStudentIdAndStatusAndBatchId(student.getId(), RegistrationStatus.PENDING, batch.getId())) {
+            throw new BusinessException("Bạn đã có một đăng ký đang chờ duyệt hoặc đã được xác nhận. Vui lòng kiểm tra tab 'Đề tài đăng ký'.");
         }
 
         // ════════════════════════════════════════════════════════════════
@@ -260,12 +259,12 @@ public class TopicRegistrationService {
         }
 
         // ── 4. Trong thời hạn đăng ký đề tài ──
-        LocalDate today = LocalDate.now();
-        if (today.isBefore(batch.getTopicRegStart())) {
-            throw new BusinessException("Chưa đến thời hạn đăng ký đề tài. Đăng ký mở từ ngày " + batch.getTopicRegStart() + ".");
+        OffsetDateTime now = OffsetDateTime.now();
+        if (now.isBefore(batch.getTopicRegStart())) {
+            throw new BusinessException("Chưa đến thời hạn đăng ký đề tài. Đăng ký mở từ: " + batch.getTopicRegStart() + ".");
         }
-        if (today.isAfter(batch.getTopicRegEnd())) {
-            throw new BusinessException("Đã hết thời hạn đăng ký đề tài. Hạn chót là ngày " + batch.getTopicRegEnd() + ".");
+        if (now.isAfter(batch.getTopicRegEnd())) {
+            throw new BusinessException("Đã hết thời hạn đăng ký đề tài. Hạn chót là: " + batch.getTopicRegEnd() + ".");
         }
 
         // ── 5. SV phải có Thesis record trong đợt ──
@@ -287,10 +286,10 @@ public class TopicRegistrationService {
                     + ") không cho phép đề xuất đề tài.");
         }
 
-        // ── 8. Chưa có registration APPROVED trong batch ──
-        if (registrationRepo.existsByStudentIdAndStatusAndBatchId(
-                student.getId(), RegistrationStatus.APPROVED, batch.getId())) {
-            throw new BusinessException("Bạn đã có đăng ký được duyệt trong đợt này. Không thể đề xuất thêm.");
+        // ── 8. SV chưa có registration APPROVED hoặc PENDING trong cùng BATCH ──
+        if (registrationRepo.existsByStudentIdAndStatusAndBatchId(student.getId(), RegistrationStatus.APPROVED, batch.getId())
+                || registrationRepo.existsByStudentIdAndStatusAndBatchId(student.getId(), RegistrationStatus.PENDING, batch.getId())) {
+            throw new BusinessException("Bạn đã có một đăng ký đang chờ duyệt hoặc đã được xác nhận. Vui lòng kiểm tra tab 'Đề tài đăng ký'.");
         }
 
         // ── 9. Resolve preferred lecturer (nhánh 2.1 vs 2.2) ──
@@ -474,10 +473,25 @@ public class TopicRegistrationService {
         String studentName = (u.getLastName() != null ? u.getLastName() : "") + " "
                 + (u.getFirstName() != null ? u.getFirstName() : "");
 
+        String advisorName = null;
+        if (reg.getThesis() != null && reg.getThesis().getAdvisor() != null) {
+            User advUser = reg.getThesis().getAdvisor().getUser();
+            advisorName = advUser.getLastName() + " " + advUser.getFirstName();
+        } else if (reg.getTopic().getSource() == TopicSource.LECTURER) {
+            User proposer = reg.getTopic().getProposedBy();
+            advisorName = proposer.getLastName() + " " + proposer.getFirstName();
+        } else if (reg.getPreferredLecturer() != null) {
+            User preferred = reg.getPreferredLecturer().getUser();
+            advisorName = preferred.getLastName() + " " + preferred.getFirstName();
+        }
+
         return TopicRegistrationResponse.builder()
                 .id(reg.getId())
                 .topicId(reg.getTopic().getId())
                 .topicTitle(reg.getTopic().getTitle())
+                .topicDescription(reg.getTopic().getDescription())
+                .topicRequirements(reg.getTopic().getRequirements())
+                .advisorName(advisorName)
                 .topicSource(reg.getTopic().getSource())
                 .studentId(reg.getStudent().getId())
                 .studentName(studentName.trim())

@@ -21,7 +21,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 import static org.mockito.Mockito.when;
@@ -64,7 +65,7 @@ class ThesisBatchControllerIntegrationTest {
     }
 
     ThesisBatchCreateRequest validCreateRequest() {
-        LocalDate base = LocalDate.of(2026, 3, 1);
+        OffsetDateTime base = OffsetDateTime.of(2026, 3, 1, 0, 0, 0, 0, ZoneOffset.ofHours(7));
         return new ThesisBatchCreateRequest(
                 "Đợt đồ án HK2 2025-2026",
                 academicYear.getId(),
@@ -78,7 +79,7 @@ class ThesisBatchControllerIntegrationTest {
     }
 
     ThesisBatchUpdateRequest validUpdateRequest() {
-        LocalDate base = LocalDate.of(2026, 3, 5);
+        OffsetDateTime base = OffsetDateTime.of(2026, 3, 5, 0, 0, 0, 0, ZoneOffset.ofHours(7));
         return new ThesisBatchUpdateRequest(
                 "Đợt đồ án HK2 2025-2026 (cập nhật)",
                 academicYear.getId(),
@@ -211,15 +212,17 @@ class ThesisBatchControllerIntegrationTest {
     @DisplayName("POST /api/batches - 400 validation lỗi")
     @WithMockUser(roles = "TRAINING_DEPT")
     void create_validationError() throws Exception {
+        OffsetDateTime t1 = OffsetDateTime.of(2026, 3, 10, 0, 0, 0, 0, ZoneOffset.ofHours(7));
+        OffsetDateTime t2 = OffsetDateTime.of(2026, 3, 5, 0, 0, 0, 0, ZoneOffset.ofHours(7));
         ThesisBatchCreateRequest invalid = new ThesisBatchCreateRequest(
                 "",
                 academicYear.getId(),
                 2,
-                LocalDate.of(2026, 3, 10), LocalDate.of(2026, 3, 5),
-                LocalDate.of(2026, 4, 1), LocalDate.of(2026, 4, 30),
-                LocalDate.of(2026, 5, 1), LocalDate.of(2026, 8, 1),
-                LocalDate.of(2026, 8, 5), LocalDate.of(2026, 8, 20),
-                LocalDate.of(2026, 8, 25), LocalDate.of(2026, 9, 5)
+                t1, t2,
+                t1.plusDays(20), t1.plusDays(30),
+                t1.plusDays(31), t1.plusDays(60),
+                t1.plusDays(61), t1.plusDays(70),
+                t1.plusDays(71), t1.plusDays(80)
         );
         mvc.perform(post("/api/batches")
                         .with(csrf())

@@ -11,7 +11,7 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import lombok.*;
 
 
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "thesis_batches")
@@ -42,32 +42,32 @@ public class ThesisBatch extends BaseEntity {
     private User createdBy;
 
     @Column(name = "topic_reg_start", nullable = false)
-    private LocalDate topicRegStart;
+    private OffsetDateTime topicRegStart;
 
     @Column(name = "topic_reg_end", nullable = false)
-    private LocalDate topicRegEnd;
+    private OffsetDateTime topicRegEnd;
 
     @Column(name = "outline_start", nullable = false)
-    private LocalDate outlineStart;
+    private OffsetDateTime outlineStart;
 
     @Column(name = "outline_end", nullable = false)
-    private LocalDate outlineEnd;
+    private OffsetDateTime outlineEnd;
 
     @Column(name = "implementation_start", nullable = false)
-    private LocalDate implementationStart;
+    private OffsetDateTime implementationStart;
 
     @Column(name = "implementation_end", nullable = false)
-    private LocalDate implementationEnd;
+    private OffsetDateTime implementationEnd;
 
     @Column(name = "defense_reg_start", nullable = false)
-    private LocalDate defenseRegStart;
+    private OffsetDateTime defenseRegStart;
 
     @Column(name = "defense_reg_end", nullable = false)
-    private LocalDate defenseRegEnd;
+    private OffsetDateTime defenseRegEnd;
 
     @Column(name = "defense_start")
-    private LocalDate defenseStart;
+    private OffsetDateTime defenseStart;
 
     @Column(name = "defense_end")
-    private LocalDate defenseEnd;
+    private OffsetDateTime defenseEnd;
 }

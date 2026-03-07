@@ -3,7 +3,7 @@ package com.phenikaa.thesis.batch.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public record ThesisBatchUpdateRequest(
@@ -18,31 +18,31 @@ public record ThesisBatchUpdateRequest(
         Integer semester,
 
         @NotNull
-        LocalDate topicRegStart,
+        OffsetDateTime topicRegStart,
 
         @NotNull
-        LocalDate topicRegEnd,
+        OffsetDateTime topicRegEnd,
 
         @NotNull
-        LocalDate outlineStart,
+        OffsetDateTime outlineStart,
 
         @NotNull
-        LocalDate outlineEnd,
+        OffsetDateTime outlineEnd,
 
         @NotNull
-        LocalDate implementationStart,
+        OffsetDateTime implementationStart,
 
         @NotNull
-        LocalDate implementationEnd,
+        OffsetDateTime implementationEnd,
 
         @NotNull
-        LocalDate defenseRegStart,
+        OffsetDateTime defenseRegStart,
 
         @NotNull
-        LocalDate defenseRegEnd,
+        OffsetDateTime defenseRegEnd,
 
-        LocalDate defenseStart,
+        OffsetDateTime defenseStart,
 
-        LocalDate defenseEnd
+        OffsetDateTime defenseEnd
 ) {
 }

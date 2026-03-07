@@ -253,6 +253,8 @@ public class ThesisService {
         java.util.Map<String, Object> result = new java.util.LinkedHashMap<>();
         result.put("batchId", batch.getId().toString());
         result.put("batchName", batch.getName());
+        result.put("topicRegStart", batch.getTopicRegStart());
+        result.put("topicRegEnd", batch.getTopicRegEnd());
         return result;
     }
 }

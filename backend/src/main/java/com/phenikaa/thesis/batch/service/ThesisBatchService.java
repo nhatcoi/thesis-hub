@@ -205,28 +205,28 @@ public class ThesisBatchService {
                 .orElseThrow(() -> new ResourceNotFoundException("AcademicYear", "id", id));
     }
 
-    private void validateDateRanges(java.time.LocalDate topicRegStart, java.time.LocalDate topicRegEnd,
-            java.time.LocalDate outlineStart, java.time.LocalDate outlineEnd,
-            java.time.LocalDate implStart, java.time.LocalDate implEnd,
-            java.time.LocalDate defRegStart, java.time.LocalDate defRegEnd,
-            java.time.LocalDate defStart, java.time.LocalDate defEnd) {
+    private void validateDateRanges(java.time.OffsetDateTime topicRegStart, java.time.OffsetDateTime topicRegEnd,
+            java.time.OffsetDateTime outlineStart, java.time.OffsetDateTime outlineEnd,
+            java.time.OffsetDateTime implStart, java.time.OffsetDateTime implEnd,
+            java.time.OffsetDateTime defRegStart, java.time.OffsetDateTime defRegEnd,
+            java.time.OffsetDateTime defStart, java.time.OffsetDateTime defEnd) {
 
-        assertBefore(topicRegStart, topicRegEnd, "Ngày bắt đầu ĐK đề tài phải trước ngày kết thúc");
-        assertBefore(outlineStart, outlineEnd, "Ngày bắt đầu đề cương phải trước ngày kết thúc");
-        assertBefore(implStart, implEnd, "Ngày bắt đầu thực hiện phải trước ngày kết thúc");
-        assertBefore(defRegStart, defRegEnd, "Ngày bắt đầu ĐK bảo vệ phải trước ngày kết thúc");
+        assertBefore(topicRegStart, topicRegEnd, "Thời gian bắt đầu ĐK đề tài phải trước thời gian kết thúc");
+        assertBefore(outlineStart, outlineEnd, "Thời gian bắt đầu đề cương phải trước thời gian kết thúc");
+        assertBefore(implStart, implEnd, "Thời gian bắt đầu thực hiện phải trước thời gian kết thúc");
+        assertBefore(defRegStart, defRegEnd, "Thời gian bắt đầu ĐK bảo vệ phải trước thời gian kết thúc");
 
         assertBefore(topicRegEnd, outlineStart, "Giai đoạn ĐK đề tài phải kết thúc trước khi bắt đầu đề cương");
         assertBefore(outlineEnd, implStart, "Giai đoạn đề cương phải kết thúc trước khi bắt đầu thực hiện");
         assertBefore(implEnd, defRegStart, "Giai đoạn thực hiện phải kết thúc trước khi bắt đầu ĐK bảo vệ");
 
         if (defStart != null && defEnd != null) {
-            assertBefore(defStart, defEnd, "Ngày bắt đầu bảo vệ phải trước ngày kết thúc");
+            assertBefore(defStart, defEnd, "Thời gian bắt đầu bảo vệ phải trước thời gian kết thúc");
             assertBefore(defRegEnd, defStart, "Giai đoạn ĐK bảo vệ phải kết thúc trước khi bắt đầu bảo vệ");
         }
     }
 
-    private void assertBefore(java.time.LocalDate from, java.time.LocalDate to, String message) {
+    private void assertBefore(java.time.OffsetDateTime from, java.time.OffsetDateTime to, String message) {
         if (from != null && to != null && !from.isBefore(to)) {
             throw new BusinessException(message);
         }

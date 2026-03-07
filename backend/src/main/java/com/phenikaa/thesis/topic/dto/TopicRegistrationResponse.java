@@ -14,6 +14,9 @@ public class TopicRegistrationResponse {
     private UUID id;
     private UUID topicId;
     private String topicTitle;
+    private String topicDescription;
+    private String topicRequirements;
+    private String advisorName;
     private TopicSource topicSource; // Thêm để phân biệt LECTURER vs STUDENT proposal
     private UUID studentId;
     private String studentName;

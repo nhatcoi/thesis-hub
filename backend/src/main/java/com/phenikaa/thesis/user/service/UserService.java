@@ -73,15 +73,6 @@ public class UserService {
 
             if (facultyId != null) {
                 // Tạm thời comment logic faculty vì mapping thay đổi
-                /*
-                 * Join<User, Student> studentJoin = root.join("student",
-                 * jakarta.persistence.criteria.JoinType.LEFT);
-                 * Join<User, Lecturer> lecturerJoin = root.join("lecturer",
-                 * jakarta.persistence.criteria.JoinType.LEFT);
-                 * predicates.add(cb.or(
-                 * cb.equal(studentJoin.get("major").get("faculty").get("id"), facultyId),
-                 * cb.equal(lecturerJoin.get("faculty").get("id"), facultyId)));
-                 */
             }
 
             if (majorCode != null && !majorCode.isBlank()) {
@@ -89,8 +80,10 @@ public class UserService {
                 predicates.add(cb.equal(studentJoin.get("majorCode"), majorCode));
             }
 
-            if (query.getResultType() != Long.class && query.getResultType() != long.class) {
+            // Chỉ fetch roles khi không phải count query
+            if (Long.class != query.getResultType() && long.class != query.getResultType()) {
                 root.fetch("roles", jakarta.persistence.criteria.JoinType.LEFT);
+                query.distinct(true);
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
