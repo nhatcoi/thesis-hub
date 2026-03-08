@@ -1,34 +1,13 @@
 # Tổng quan Notification
 
-| # | Type | Đã implement gửi? | Nơi gọi | Người nhận | Nội dung |
-|---|------|:-----------------:|---------|------------|----------|
-| 1 | `BATCH_OPENED` | ✅ | `ThesisBatchServiceImpl.activateBatch()` | Trưởng ngành, Giảng viên | Đợt đồ án '{tên}' đã được kích hoạt |
-| 2 | `TOPIC_REGISTERED` | ✅ | `TopicRegistrationServiceImpl.registerTopic()` | Giảng viên hướng dẫn | SV {tên} ({mã}) đã đăng ký đề tài '{tên}'. Hiện có X/Y SV |
-| 3 | `TOPIC_APPROVED` | ❌ | — | — | Chưa gửi |
-| 4 | `TOPIC_REJECTED` | ❌ | — | — | Chưa gửi |
-| 5 | `ADVISOR_ASSIGNED` | ❌ | — | — | Chưa gửi |
-| 6 | `OUTLINE_REVIEWED` | ❌ | — | — | Chưa gửi |
-| 7 | `PROGRESS_REMINDER` | ❌ | — | — | Chưa gửi |
-| 8 | `DEFENSE_SCHEDULED` | ❌ | — | — | Chưa gửi |
-| 9 | `SCORE_PUBLISHED` | ❌ | — | — | Chưa gửi |
-| 10 | `GENERAL` | ❌ | — | — | Chưa gửi |
-
----
-
-## Enum NotificationType
-
-| Type | Mô tả |
-|------|-------|
-| `BATCH_OPENED` | Đợt đồ án được kích hoạt |
-| `TOPIC_REGISTERED` | Sinh viên đăng ký đề tài (FCFS) |
-| `TOPIC_APPROVED` | Đăng ký đề tài được duyệt (đề xuất SV) |
-| `TOPIC_REJECTED` | Đăng ký đề tài bị từ chối |
-| `ADVISOR_ASSIGNED` | GV được gán hướng dẫn sinh viên |
-| `OUTLINE_REVIEWED` | Đề cương được duyệt/từ chối |
-| `PROGRESS_REMINDER` | Nhắc nhở cập nhật tiến độ |
-| `DEFENSE_SCHEDULED` | Đã xếp lịch bảo vệ |
-| `SCORE_PUBLISHED` | Điểm đã công bố |
-| `GENERAL` | Thông báo chung |
+| # | Loại (NotificationType) | Khi nào | Người nhận | Nội dung |
+|---|-------------------------|---------|------------|----------|
+| 1 | `BATCH_OPENED` | PĐT mở đợt đồ án | SV, GV, TN trong đợt | Đợt ĐATN [tên] đã mở đăng ký |
+| 2 | `TOPIC_REGISTERED` | SV đăng ký đề tài (FCFS) | GV tạo đề tài | SV [tên] đã đăng ký đề tài [tên] |
+| 3 | `TOPIC_PROPOSED` | SV đề xuất đề tài mới | GVHD mong muốn + TN (theo ngành) | SV [tên] đã đề xuất đề tài [tên] |
+| 4 | `TOPIC_APPROVED` | TN duyệt đề xuất | SV đề xuất | Đề tài [tên] đã được phê duyệt |
+| 5 | `TOPIC_REJECTED` | TN từ chối đề xuất | SV đề xuất | Đề tài [tên] bị từ chối. Lý do: ... |
+| 6 | `ADVISOR_ASSIGNED` | TN duyệt & phân công GV | GVHD được phân công | Bạn được phân công hướng dẫn SV [tên] cho đề tài [tên] |
 
 ---
 
@@ -47,103 +26,34 @@ void sendNotification(
 
 ---
 
-## Chi tiết từng notification
+## Chi tiết
 
-### 1. BATCH_OPENED ✅
+### 1. BATCH_OPENED
+- **Khi nào:** PĐT kích hoạt đợt đồ án (DRAFT → ACTIVE).
+- **Người nhận:** SV, GV, TN trong đợt (SV đã được gán vào đợt).
+- **Nội dung:** "Đợt ĐATN [tên] đã mở đăng ký"
 
-- **Điều kiện:** Admin/Trưởng ngành kích hoạt đợt đồ án (DRAFT → ACTIVE).
-- **File:** `ThesisBatchServiceImpl.activateBatch()`
-- **Người nhận:** Tất cả Trưởng ngành, tất cả Giảng viên
-- **Title:** `Đợt đồ án mới đã mở`
-- **Message:** `Đợt đồ án '{tên}' đã được kích hoạt.`
-- **refType / refId:** `ThesisBatch`, `batch.getId()`
+### 2. TOPIC_REGISTERED
+- **Khi nào:** SV đăng ký đề tài có sẵn (FCFS), gán ngay.
+- **Người nhận:** GV tạo đề tài (`topic.getProposedBy()`).
+- **Nội dung:** "SV [tên] đã đăng ký đề tài [tên]"
 
----
+### 3. TOPIC_PROPOSED
+- **Khi nào:** SV gửi đề xuất đề tài mới.
+- **Người nhận:** GVHD mong muốn (nếu SV chọn) + TN theo ngành đề tài.
+- **Nội dung:** "SV [tên] đã đề xuất đề tài [tên]"
 
-### 2. TOPIC_REGISTERED ✅
+### 4. TOPIC_APPROVED
+- **Khi nào:** TN (hoặc GV) duyệt đề xuất đề tài của SV.
+- **Người nhận:** SV đề xuất.
+- **Nội dung:** "Đề tài [tên] đã được phê duyệt"
 
-- **Điều kiện:** Sinh viên đăng ký đề tài có sẵn (FCFS), gán ngay.
-- **File:** `TopicRegistrationServiceImpl.registerTopic()` → `notifyLecturerOnRegister()`
-- **Người nhận:** GV sở hữu đề tài (`topic.getProposedBy()`)
-- **Title:** `Sinh viên đăng ký đề tài`
-- **Message:** `Sinh viên {họ tên} ({mã SV}) đã đăng ký đề tài "{tên đề tài}". Đề tài hiện có X/Y sinh viên.`
-- **refType / refId:** `TOPIC`, `topic.getId()`
+### 5. TOPIC_REJECTED
+- **Khi nào:** TN (hoặc GV) từ chối đề xuất đề tài của SV.
+- **Người nhận:** SV đề xuất.
+- **Nội dung:** "Đề tài [tên] bị từ chối. Lý do: ..."
 
----
-
-### 3. TOPIC_APPROVED ❌
-
-- **Dự kiến:** Khi GV/Trưởng ngành duyệt đăng ký đề xuất đề tài của SV.
-- **Người nhận:** Sinh viên.
-- **Gợi ý nơi gọi:** `TopicRegistrationServiceImpl.approveRegistration()` khi `req.getStatus() == APPROVED`.
-- **Gợi ý message:** "Đề tài '{tên}' của bạn đã được phê duyệt."
-
----
-
-### 4. TOPIC_REJECTED ❌
-
-- **Dự kiến:** Khi GV/Trưởng ngành từ chối đăng ký đề xuất đề tài của SV.
-- **Người nhận:** Sinh viên.
-- **Gợi ý nơi gọi:** `TopicRegistrationServiceImpl.approveRegistration()` khi `req.getStatus() == REJECTED`.
-- **Gợi ý message:** "Đề tài '{tên}' của bạn đã bị từ chối. Lý do: {rejectReason}"
-
----
-
-### 5. ADVISOR_ASSIGNED ❌
-
-- **Dự kiến:** Khi GV được gán hướng dẫn sinh viên (đề xuất SV không chọn GV → TN phân công).
-- **Người nhận:** Giảng viên được gán.
-- **Gợi ý nơi gọi:** Khi phân công GVHD trong `TopicRegistrationServiceImpl.approveRegistration()` hoặc khi Trưởng ngành gán advisor.
-
----
-
-### 6. OUTLINE_REVIEWED ❌
-
-- **Dự kiến:** Khi GVHD duyệt hoặc từ chối đề cương.
-- **Người nhận:** Sinh viên.
-- **Gợi ý message:** "Đề cương đồ án của bạn đã được duyệt." / "Đề cương cần chỉnh sửa: {nhận xét}"
-
----
-
-### 7. PROGRESS_REMINDER ❌
-
-- **Dự kiến:** Job định kỳ nhắc SV cập nhật tiến độ.
-- **Người nhận:** Sinh viên chưa cập nhật đúng hạn.
-
----
-
-### 8. DEFENSE_SCHEDULED ❌
-
-- **Dự kiến:** Khi xếp lịch bảo vệ cho SV/hội đồng.
-- **Người nhận:** SV, thành viên hội đồng.
-
----
-
-### 9. SCORE_PUBLISHED ❌
-
-- **Dự kiến:** Khi điểm cuối được công bố.
-- **Người nhận:** Sinh viên.
-
----
-
-### 10. GENERAL ❌
-
-- **Dự kiến:** Thông báo tùy biến, không thuộc nhóm trên.
-
----
-
-## Tóm tắt
-
-| Trạng thái | Số lượng |
-|------------|----------|
-| Đã implement gửi | **2/10** |
-| Chưa implement | **8/10** |
-
-**Đã gửi:**
-1. `BATCH_OPENED` — khi kích hoạt đợt đồ án
-2. `TOPIC_REGISTERED` — khi SV đăng ký đề tài (FCFS), thông báo cho GV
-
-**Ưu tiên implement tiếp:**
-- `TOPIC_APPROVED` / `TOPIC_REJECTED` — thông báo SV khi duyệt/từ chối đề xuất đề tài
-- `ADVISOR_ASSIGNED` — thông báo GV khi được gán hướng dẫn
-- `OUTLINE_REVIEWED` — thông báo SV khi duyệt đề cương
+### 6. ADVISOR_ASSIGNED
+- **Khi nào:** TN duyệt đề xuất & phân công GVHD (có thể khác GV SV chọn).
+- **Người nhận:** GVHD được phân công.
+- **Nội dung:** "Bạn được phân công hướng dẫn SV [tên] cho đề tài [tên]"
