@@ -8,10 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
-/**
- * Syncs user info from Zitadel token claims into the local users table.
- * Works with both JWT claims and opaque token introspection attributes.
- */
 @Service
 public class UserSyncService {
 

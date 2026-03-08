@@ -9,9 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
-/**
- * Resolves the currently authenticated user (JWT or opaque token) to the local User entity.
- */
 @Service
 public class CurrentUserService {
 
