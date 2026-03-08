@@ -56,6 +56,7 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/ws/**",
+            "/uploads/**",
             "/error"
     };
 

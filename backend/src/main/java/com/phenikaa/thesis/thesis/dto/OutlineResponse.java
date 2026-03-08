@@ -18,4 +18,9 @@ public class OutlineResponse {
     private String reviewerName;
     private OffsetDateTime reviewedAt;
     private OffsetDateTime submittedAt;
+    // For lecturer view
+    private String studentName;
+    private String studentCode;
+    private String topicTitle;
+    private String publicUrl;
 }

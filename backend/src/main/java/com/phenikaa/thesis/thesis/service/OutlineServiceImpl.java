@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -74,6 +75,50 @@ public class OutlineServiceImpl implements OutlineService {
                 .stream().map(outlineMapper::toResponse).toList();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<OutlineResponse> getAdvisingOutlines(User user) {
+        if (user.getLecturer() == null) return List.of();
+        return outlineRepo.findByAdvisorId(user.getLecturer().getId())
+                .stream().map(outlineMapper::toResponse).toList();
+    }
+
+    @Override
+    @Transactional
+    @Auditable(action = "REVIEW_OUTLINE", entityType = "Outline")
+    public OutlineResponse reviewOutline(UUID outlineId, User user, String status, String comment) {
+        if (user.getLecturer() == null)
+            throw new BusinessException("Chỉ giảng viên mới có thể duyệt đề cương.");
+
+        Outline outline = outlineRepo.findById(outlineId)
+                .orElseThrow(() -> new BusinessException("Không tìm thấy đề cương với ID: " + outlineId));
+
+        // Check advisor is the reviewer
+        Thesis thesis = outline.getThesis();
+        if (thesis.getAdvisor() == null || !thesis.getAdvisor().getId().equals(user.getLecturer().getId()))
+            throw new BusinessException("Bạn không phải GVHD của sinh viên này.");
+
+        if (outline.getStatus() != OutlineStatus.SUBMITTED)
+            throw new BusinessException("Đề cương này đã được xử lý (trạng thái: " + outline.getStatus() + ").");
+
+        OutlineStatus outlineStatus = "APPROVED".equals(status) ? OutlineStatus.APPROVED : OutlineStatus.REJECTED;
+        outline.setStatus(outlineStatus);
+        outline.setReviewerComment(comment);
+        outline.setReviewedBy(user.getLecturer());
+        outline.setReviewedAt(OffsetDateTime.now());
+        outlineRepo.save(outline);
+
+        // Update thesis status
+        thesis.setStatus(outlineStatus == OutlineStatus.APPROVED
+                ? ThesisStatus.OUTLINE_APPROVED : ThesisStatus.OUTLINE_REJECTED);
+        thesisRepo.save(thesis);
+
+        // Notify student
+        notifyStudent(thesis, user, outlineStatus, comment);
+
+        return outlineMapper.toResponse(outline);
+    }
+
     // ── Private helpers ──
 
     private Thesis findActiveThesis(User user) {
@@ -113,5 +158,22 @@ public class OutlineServiceImpl implements OutlineService {
                 "Sinh viên " + studentName + " (" + student.getStudent().getStudentCode()
                         + ") đã nộp đề cương v" + version + " cho đề tài \"" + topicTitle + "\".",
                 "OUTLINE", thesis.getId());
+    }
+
+    private void notifyStudent(Thesis thesis, User reviewer, OutlineStatus status, String comment) {
+        User studentUser = thesis.getStudent().getUser();
+        String topicTitle = thesis.getTopic() != null ? thesis.getTopic().getTitle() : "N/A";
+
+        if (status == OutlineStatus.APPROVED) {
+            notificationService.sendNotification(studentUser, NotificationType.OUTLINE_REVIEWED,
+                    "Đề cương được duyệt",
+                    "Đề cương cho đề tài \"" + topicTitle + "\" đã được GVHD duyệt. Bạn có thể bắt đầu triển khai.",
+                    "OUTLINE", thesis.getId());
+        } else {
+            String msg = "Đề cương cho đề tài \"" + topicTitle + "\" cần chỉnh sửa.";
+            if (comment != null && !comment.isBlank()) msg += " Nhận xét: " + comment;
+            notificationService.sendNotification(studentUser, NotificationType.OUTLINE_REVIEWED,
+                    "Đề cương cần chỉnh sửa", msg, "OUTLINE", thesis.getId());
+        }
     }
 }
