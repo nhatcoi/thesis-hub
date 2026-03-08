@@ -109,7 +109,7 @@ export class NotificationService implements OnDestroy {
                 {
                     duration: 6000,
                     horizontalPosition: 'end',
-                    verticalPosition: 'top',
+                    verticalPosition: 'bottom',
                     panelClass: ['notification-toast']
                 }
             );
