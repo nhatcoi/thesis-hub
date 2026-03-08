@@ -18,12 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Helper service xử lý từng dòng import trong transaction riêng biệt
- * (REQUIRES_NEW).
- * Giúp tránh lỗi rollback-only khi một dòng thất bại nhưng các dòng khác vẫn
- * thành công.
- */
 @Service
 @RequiredArgsConstructor
 public class UserImportRowProcessor {
@@ -47,7 +41,6 @@ public class UserImportRowProcessor {
                 student.setStudentCode(row.getUsername());
                 student.setMajorCode(row.getMajorCode());
                 student.setCohort(row.getCohort());
-                // PĐT chịu trách nhiệm lọc đủ điều kiện trước khi import
                 student.setEligibleForThesis(Boolean.TRUE);
 
                 studentRepository.save(student);
@@ -91,7 +84,6 @@ public class UserImportRowProcessor {
                                 .orElseThrow(() -> new RuntimeException("Role not found: " + role));
                 user.getRoles().add(roleEntity);
 
-                // Gán trạng thái mặc định ACTIVE cho user mới
                 if (user.getStatus() == null) {
                         user.setStatus(com.phenikaa.thesis.user.entity.enums.UserStatus.ACTIVE);
                 }

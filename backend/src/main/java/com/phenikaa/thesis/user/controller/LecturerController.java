@@ -12,10 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Endpoint công khai (authenticated) để xem danh sách giảng viên.
- * Dùng cho SV chọn GV khi đề xuất đề tài.
- */
 @RestController
 @RequestMapping("/api/lecturers")
 @RequiredArgsConstructor
