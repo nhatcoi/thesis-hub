@@ -13,15 +13,15 @@ import { MatIconModule } from '@angular/material/icon';
     <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <div class="flex justify-center">
-          <div class="w-16 h-16 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-            <span class="text-white text-3xl font-bold">T</span>
+          <div class="w-16 h-16 rounded-xl flex items-center justify-center">
+            <img src="/logo.svg" alt="ThesisHub Logo" class="w-16 h-16">
           </div>
         </div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Thesis Management System
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 uppercase tracking-widest">
+          ThesisHub PKA
         </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
-          Hệ thống Quản lý Đồ án Tốt nghiệp - Đại học Phenikaa
+        <p class="mt-2 text-center text-sm font-medium text-gray-500 italic">
+          Nền tảng Quản lý Đồ án Tốt nghiệp - Đại học Phenikaa
         </p>
       </div>
 

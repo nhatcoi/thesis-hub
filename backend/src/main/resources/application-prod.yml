@@ -1,0 +1,68 @@
+
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  # ---- DataSource (Production DB) ----
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:thesis_management}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:20}
+      minimum-idle: ${DB_POOL_MIN:5}
+      connection-timeout: 30000
+      leak-detection-threshold: 60000
+
+  # ---- JPA / Hibernate ----
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  # ---- Security / OAuth2 Resource Server (Zitadel SSO - Production) ----
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${ZITADEL_ISSUER_URI:https://sso.openpka.site}
+
+# ---- Zitadel introspection (Production) ----
+zitadel:
+  introspection:
+    client-id: ${ZITADEL_CLIENT_ID}
+    client-secret: ${ZITADEL_CLIENT_SECRET}
+
+# ---- Logging (chỉ WARN+ cho production, giảm noise) ----
+logging:
+  level:
+    root: WARN
+    com.phenikaa.thesis: INFO
+    org.hibernate.SQL: WARN
+    org.springframework.security: WARN
+  file:
+    name: ${LOG_PATH:/var/log/thesishub}/thesishub.log
+  logback:
+    rollingpolicy:
+      max-file-size: 50MB
+      max-history: 30
+      total-size-cap: 1GB
+
+# ---- SpringDoc (tắt Swagger ở production) ----
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
+
+# ---- Actuator (hạn chế expose ở prod) ----
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never

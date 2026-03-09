@@ -1,0 +1,30 @@
+# Maven/Java
+target/
+*.jar
+*.war
+*.ear
+*.class
+
+# IDEs
+.idea/
+.vscode/
+.settings/
+.project
+.classpath
+*.iml
+*.iws
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+
+# Git
+.git
+.gitignore
+
+# Env
+.env
+.env.*

@@ -100,13 +100,13 @@ const MENU_MAP: Record<string, MenuEntry[]> = {
         </button>
 
         <div class="h-16 flex items-center px-6 border-b border-gray-100 gap-2 shrink-0">
-          <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-indigo-100 shrink-0">
-            <mat-icon class="!text-lg">school</mat-icon>
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
+            <img src="/logo.svg" alt="ThesisHub Logo" class="w-7 h-7">
           </div>
           @if (!collapsed()) {
             <div class="flex flex-col animate-in fade-in duration-300">
-              <span class="text-xs font-black text-gray-900 uppercase tracking-widest leading-none">ThesisMgr</span>
-              <span class="text-[9px] font-bold text-indigo-500 uppercase tracking-tighter italic">Quản lý Đồ án</span>
+              <span class="text-xs font-black text-gray-900 uppercase tracking-widest leading-none">ThesisHub</span>
+              <span class="text-[9px] font-bold text-indigo-500 uppercase tracking-tighter italic">Phenikaa University</span>
             </div>
           }
         </div>
@@ -200,8 +200,9 @@ const MENU_MAP: Record<string, MenuEntry[]> = {
       <div class="flex-1 flex flex-col overflow-hidden bg-white">
         <!-- Topbar -->
         <header class="h-16 border-b border-gray-100 flex items-center justify-between px-8 bg-white/80 backdrop-blur-md z-10 sticky top-0">
-          <div class="flex items-center gap-4">
-            <h1 class="text-xs font-black text-gray-400 uppercase tracking-widest italic">Phenikaa University Thesis System</h1>
+          <div class="flex items-center gap-2">
+            <img src="/logo.svg" alt="ThesisHub" class="w-6 h-6">
+            <h1 class="text-xs font-black text-gray-600 uppercase tracking-widest">ThesisHub PKA</h1>
           </div>
           
           <div class="flex items-center gap-6">
@@ -237,8 +238,79 @@ const MENU_MAP: Record<string, MenuEntry[]> = {
         </header>
 
         <!-- Viewport -->
-        <main class="flex-1 overflow-y-auto p-4 lg:p-6 scroll-smooth bg-gray-50/30">
-          <router-outlet></router-outlet>
+        <main class="flex-1 overflow-y-auto scroll-smooth bg-gray-50/30">
+          <div class="p-4 lg:p-6 min-h-[calc(100vh-64px-200px)]">
+            <router-outlet></router-outlet>
+          </div>
+
+          <!-- Footer -->
+          <footer class="bg-white border-t border-gray-100 pt-12 pb-8 px-8">
+            <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+              <!-- Branding & Social -->
+              <div class="space-y-4">
+                <div class="flex items-center gap-2">
+                  <img src="/logo.svg" alt="ThesisHub Logo" class="w-8 h-8">
+                  <span class="text-base font-black text-gray-900 uppercase tracking-widest">ThesisHub PKA</span>
+                </div>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                  Hệ thống quản lý đồ án tốt nghiệp hiện đại tại Đại học Phenikaa. Tối ưu hóa quy trình, kết nối sinh viên và giảng viên.
+                </p>
+                <div class="flex gap-3 pt-2">
+                  <a href="#" class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all border border-gray-100">
+                    <mat-icon class="!text-sm">facebook</mat-icon>
+                  </a>
+                  <a href="#" class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all border border-gray-100">
+                    <mat-icon class="!text-sm">language</mat-icon>
+                  </a>
+                  <a href="#" class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all border border-gray-100">
+                    <mat-icon class="!text-sm">alternate_email</mat-icon>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Links sections -->
+              <div>
+                <h4 class="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-4">Khám phá</h4>
+                <ul class="space-y-2">
+                  <li><a routerLink="/support/about" class="text-xs text-gray-500 hover:text-indigo-600 transition-colors cursor-pointer">Về chúng tôi</a></li>
+                  <li><a href="#" class="text-xs text-gray-500 hover:text-indigo-600 transition-colors">Tin tức & Sự kiện</a></li>
+                  <li><a href="#" class="text-xs text-gray-500 hover:text-indigo-600 transition-colors">Cơ hội nghề nghiệp</a></li>
+                  <li><a href="#" class="text-xs text-gray-500 hover:text-indigo-600 transition-colors">Liên hệ</a></li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 class="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-4">Hỗ trợ</h4>
+                <ul class="space-y-2">
+                  <li><a routerLink="/support/privacy" class="text-xs text-gray-500 hover:text-indigo-600 transition-colors cursor-pointer">Chính sách bảo mật</a></li>
+                  <li><a routerLink="/support/terms" class="text-xs text-gray-500 hover:text-indigo-600 transition-colors cursor-pointer">Điều khoản dịch vụ</a></li>
+                  <li><a href="https://phenikaa-uni.gitbook.io" target="_blank" class="text-xs text-gray-500 hover:text-indigo-600 transition-colors flex items-center gap-1">
+                    Hướng dẫn sử dụng <mat-icon class="!text-[10px] !w-3 !h-3">open_in_new</mat-icon>
+                  </a></li>
+                  <li><a routerLink="/support/faq" class="text-xs text-gray-500 hover:text-indigo-600 transition-colors cursor-pointer">Câu hỏi thường gặp</a></li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 class="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-4">Các sản phẩm khác</h4>
+                <ul class="space-y-2">
+                  <li><a href="#" class="text-xs text-gray-500 hover:text-indigo-600 transition-colors italic">PKA LMS</a></li>
+                  <li><a href="#" class="text-xs text-gray-500 hover:text-indigo-600 transition-colors italic">PKA Student Portal</a></li>
+                  <li><a href="#" class="text-xs text-gray-500 hover:text-indigo-600 transition-colors italic">PKA Library</a></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
+              <p class="text-[10px] font-bold text-gray-400">
+                © 2026 ThesisHub PKA. All rights reserved.
+              </p>
+              <div class="flex gap-6">
+                <a routerLink="/support/faq" class="text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition-colors cursor-pointer">Sitemap</a>
+                <a routerLink="/support/privacy" class="text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition-colors cursor-pointer">Cookies Policy</a>
+              </div>
+            </div>
+          </footer>
         </main>
       </div>
     </div>

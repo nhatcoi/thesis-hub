@@ -33,3 +33,4 @@ dist/
 .project
 .classpath
 .settings/
+backup*.dump

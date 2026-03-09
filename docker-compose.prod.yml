@@ -1,0 +1,33 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: thesishub-backend
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_HOST=103.252.136.113
+      - DB_PORT=5432
+      - DB_NAME=thesis_management
+      - DB_USERNAME=sad_admin
+      - DB_PASSWORD=sad_secret_2026
+      - ZITADEL_ISSUER_URI=https://sso.openpka.site
+      - ZITADEL_CLIENT_ID=362704457538011138@thesis_management_system
+      - ZITADEL_CLIENT_SECRET=agPaB6vl8QpA8xSl28blUpBI0RV5AbCeL7hFsoavbC0xPT8gsqhWoxyzAA4nkY0U
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./logs/backend:/var/log/thesishub
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: thesishub-frontend
+    restart: unless-stopped
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend

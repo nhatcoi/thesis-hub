@@ -61,6 +61,7 @@ export const routes: Routes = [
       { path: 'student/notifications', loadComponent: () => import('./features/shared/notification-list.component').then(m => m.NotificationListComponent) },
       { path: 'student/history', loadComponent: () => import('./features/shared/history-list.component').then(m => m.HistoryListComponent) },
       { path: 'profile', loadComponent: () => import('./features/shared/profile.component').then(m => m.ProfileComponent) },
+      { path: 'support/:type', loadComponent: () => import('./features/shared/support.component').then(m => m.SupportComponent) },
     ]
   },
   { path: '**', redirectTo: 'login' }

@@ -1,11 +1,13 @@
 # ============================================================
-# Thesis Management System - Application Configuration
+# ThesisHub PKA - Common Configuration
 # ============================================================
-
-server:
-  port: 8080
+# Profile mặc định: dev
+# Chạy prod: java -jar app.jar --spring.profiles.active=prod
 
 spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
   application:
     name: thesis-management
 
@@ -14,27 +16,14 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
-  # ---- DataSource ----
-  datasource:
-    url: jdbc:postgresql://localhost:5432/thesis_management
-    username: sad_admin
-    password: sad_secret_2026
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      connection-timeout: 30000
-
-  # ---- JPA / Hibernate ----
+  # ---- JPA / Hibernate (common) ----
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
-    show-sql: true
     open-in-view: false
     properties:
       hibernate:
-        format_sql: true
         jdbc:
           time_zone: Asia/Ho_Chi_Minh
 
@@ -43,25 +32,16 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.yaml
     enabled: false
 
-  # ---- Security / OAuth2 Resource Server (Zitadel SSO) ----
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:18080
-
-# Zitadel introspection (for opaque tokens - uses a confidential client)
-zitadel:
-  introspection:
-    client-id: 362704457538011138@thesis_management_system
-    client-secret: agPaB6vl8QpA8xSl28blUpBI0RV5AbCeL7hFsoavbC0xPT8gsqhWoxyzAA4nkY0U
-
   # ---- Jackson ----
   jackson:
     serialization:
       write-dates-as-timestamps: false
     time-zone: Asia/Ho_Chi_Minh
     default-property-inclusion: non_null
+
+# ---- Server ----
+server:
+  port: ${SERVER_PORT:8080}
 
 # ---- Actuator ----
 management:
@@ -78,9 +58,9 @@ management:
 
 info:
   app:
-    name: Thesis Management System
-    description: Hệ thống Quản lý Đồ án Tốt nghiệp - Đại học Phenikaa
-    version: 0.0.1-SNAPSHOT
+    name: ThesisHub PKA
+    description: Nền tảng Quản lý Đồ án Tốt nghiệp - Đại học Phenikaa
+    version: 1.0.0
 
 # ---- SpringDoc / Swagger ----
 springdoc:
@@ -90,10 +70,3 @@ springdoc:
     path: /swagger-ui.html
     operations-sorter: method
     tags-sorter: alpha
-
-# ---- Logging ----
-logging:
-  level:
-    com.phenikaa.thesis: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
