@@ -103,6 +103,20 @@ public class AuditLogServiceImpl implements AuditLogService {
             case "PROPOSE_TOPIC" -> "Đã đề xuất đề tài mới: " + displayName;
             case "APPROVE_REGISTRATION" -> "Đã duyệt đăng ký đề tài: " + displayName + " cho SV: " + data.get("studentCode");
             case "REJECT_REGISTRATION" -> "Đã từ chối đăng ký đề tài: " + displayName + " của SV: " + data.get("studentCode");
+
+            case "SUBMIT_OUTLINE" -> "Đã nộp đề cương: " + data.get("fileName") + " (Phiên bản " + data.get("version") + ")";
+            case "REVIEW_OUTLINE" -> {
+                String status = String.valueOf(data.get("status"));
+                String res = "APPROVED".equals(status) ? "Đã duyệt" : "Đã từ chối";
+                yield res + " đề cương của SV: " + data.get("studentName") + " (" + data.get("studentCode") + ")";
+            }
+            case "SUBMIT_PROGRESS" -> "Đã cập nhật tiến độ tuần " + data.get("weekNumber") + ": " + data.get("title");
+            case "REVIEW_PROGRESS" -> {
+                String status = String.valueOf(data.get("status"));
+                String res = "REVIEWED".equals(status) ? "Đã nhận xét (Đạt)" : "Đã yêu cầu bổ sung";
+                yield res + " tiến độ tuần " + data.get("weekNumber") + " của SV: " + data.get("studentName") + " (" + data.get("studentCode") + ")";
+            }
+
             default -> "Thao tác " + log.getAction() + " trên " + log.getEntityType() + " (ID: " + log.getEntityId() + ")";
         };
     }

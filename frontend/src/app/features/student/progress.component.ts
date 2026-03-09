@@ -13,20 +13,27 @@ import { ProgressService, ProgressUpdateResponse } from '../../core/progress.ser
   template: `
     <div class="space-y-6 max-w-4xl mx-auto">
       <div class="app-section-header">
-        <h2 class="app-title">Cập nhật tiến độ</h2>
-        <p class="app-subtitle">Báo cáo tiến độ thực hiện đồ án theo tuần.</p>
+        <h2 class="app-title truncate max-w-lg">Cập nhật tiến độ</h2>
+        <p class="app-subtitle italic flex flex-wrap items-center gap-x-4 gap-y-1">
+          @if (batchName()) {
+            <span>Báo cáo tiến độ thực hiện đồ án theo tuần.</span>
+            @if (implStart() && implEnd()) {
+              <span class="flex items-center gap-1.5 text-indigo-500 font-bold bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100/50 font-mono">
+                <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">event</mat-icon>
+                Giai đoạn: {{ implStart() | date:'dd/MM/yyyy' }} - {{ implEnd() | date:'dd/MM/yyyy' }}
+              </span>
+              @if (isAfterImpl()) {
+                <span class="flex items-center gap-1 text-red-500 font-black uppercase tracking-tighter">
+                  <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">alarm_off</mat-icon>
+                  (Đã kết thúc)
+                </span>
+              }
+            }
+          } @else {
+            Bạn cần tham gia đợt ĐATN và được phân công đề tài trước.
+          }
+        </p>
       </div>
-
-      @if (batchName()) {
-        <div class="app-card !p-4">
-          <div class="flex items-center justify-between flex-wrap gap-2">
-            <span class="text-sm font-bold text-gray-900">{{ batchName() }}</span>
-            <span class="app-badge !text-[10px]">
-              📅 Giai đoạn: {{ implStart() | date:'dd/MM/yyyy' }} – {{ implEnd() | date:'dd/MM/yyyy' }}
-            </span>
-          </div>
-        </div>
-      }
 
       @if (loading()) {
         <div class="flex justify-center py-12">

@@ -127,27 +127,28 @@ export class HistoryListComponent implements OnInit {
     if (action.includes('DELETE')) return 'delete_sweep';
     if (action.includes('ACTIVATE')) return 'bolt';
     if (action.includes('CLOSE')) return 'lock';
-    if (action.includes('IMPORT')) return 'cloud_upload';
+    if (action.includes('IMPORT') || action.includes('SUBMIT')) return 'cloud_upload';
+    if (action.includes('REVIEW')) return 'rate_review';
     return 'history';
   }
 
   getBgColor(action: string): string {
-    if (action.includes('CREATE') || action.includes('IMPORT')) return 'bg-green-50';
-    if (action.includes('UPDATE')) return 'bg-blue-50';
+    if (action.includes('CREATE') || action.includes('IMPORT') || action.includes('SUBMIT')) return 'bg-green-50';
+    if (action.includes('UPDATE') || action.includes('REVIEW')) return 'bg-blue-50';
     if (action.includes('DELETE') || action.includes('CLOSE')) return 'bg-red-50';
     return 'bg-indigo-50';
   }
 
   getIconColor(action: string): string {
-    if (action.includes('CREATE') || action.includes('IMPORT')) return 'text-green-600';
-    if (action.includes('UPDATE')) return 'text-blue-600';
+    if (action.includes('CREATE') || action.includes('IMPORT') || action.includes('SUBMIT')) return 'text-green-600';
+    if (action.includes('UPDATE') || action.includes('REVIEW')) return 'text-blue-600';
     if (action.includes('DELETE') || action.includes('CLOSE')) return 'text-red-600';
     return 'text-indigo-600';
   }
 
   getBadgeStyles(action: string): string {
-    if (action.includes('CREATE') || action.includes('IMPORT')) return 'bg-green-50 text-green-700 border-green-200';
-    if (action.includes('UPDATE')) return 'bg-blue-50 text-blue-700 border-blue-200';
+    if (action.includes('CREATE') || action.includes('IMPORT') || action.includes('SUBMIT')) return 'bg-green-50 text-green-700 border-green-200';
+    if (action.includes('UPDATE') || action.includes('REVIEW')) return 'bg-blue-50 text-blue-700 border-blue-200';
     if (action.includes('DELETE') || action.includes('CLOSE')) return 'bg-red-50 text-red-700 border-red-200';
     return 'bg-indigo-50 text-indigo-700 border-indigo-200';
   }
