@@ -181,6 +181,118 @@ GIAI ĐOẠN 1: ĐĂNG KÝ ĐỀ TÀI & THỰC HIỆN ĐỒ ÁN
    │  └─ Chuẩn bị dữ liệu đầu vào cho Giai đoạn 2 (bảo vệ đồ án)
    └─ Điều kiện kết thúc giai đoạn 1
       └─ Khi sinh viên đạt `READY_FOR_DEFENSE` và được chuyển sang Giai đoạn 2
+
+GIAI ĐOẠN 2: BẢO VỆ ĐỒ ÁN
+├─ Đầu vào: Các thesis có trạng thái `READY_FOR_DEFENSE`
+├─ Đầu ra: Điểm bảo vệ, trạng thái `GRADED` → `PASSED` / `FAILED`
+
+├─ 1. Lập hội đồng & phân công giảng viên
+│  ├─ Actor: PĐT, Trưởng ngành
+│  ├─ Nghiệp vụ PĐT / Trưởng ngành
+│  │  ├─ Tạo hội đồng bảo vệ (tên, ngành/đợt, max_theses)
+│  │  ├─ Thêm thành viên: CHAIR, SECRETARY, REVIEWER, MEMBER
+│  │  └─ Khóa cấu hình hội đồng (LOCKED) khi đã đủ thành viên
+│  └─ Nghiệp vụ Hệ thống
+│     ├─ Lưu `councils`, `council_members`
+│     └─ Kiểm tra không trùng GVHD/SV trong cùng phiên
+
+├─ 2. Xếp lịch bảo vệ
+│  ├─ Actor: PĐT, Thư ký hội đồng
+│  ├─ Nghiệp vụ PĐT / Thư ký
+│  │  ├─ Tạo phiên bảo vệ: council, phòng, ngày giờ, thời lượng
+│  │  └─ Gán từng thesis `READY_FOR_DEFENSE` vào phiên (order_in_session)
+│  ├─ Nghiệp vụ Hệ thống
+│  │  ├─ Lưu `defense_sessions`, `defense_assignments`
+│  │  └─ Kiểm tra không trùng lịch GVHD, SV, phòng
+│  └─ Thông báo
+│     ├─ SV: thời gian, phòng, hội đồng
+│     └─ GVHD + thành viên hội đồng: danh sách SV bảo vệ trong phiên
+
+├─ 3. Chuẩn bị hồ sơ cho hội đồng
+│  ├─ Actor: Thư ký hội đồng, PĐT
+│  ├─ Nghiệp vụ
+│  │  ├─ In/xuất danh sách SV theo phiên, phiếu nhận xét/điểm
+│  │  └─ Cung cấp link/file: báo cáo, slide, code cho hội đồng
+│  └─ Dữ liệu: từ hồ sơ đăng ký bảo vệ (report, code, slide)
+
+├─ 4. Tiến hành buổi bảo vệ
+│  ├─ Actor: Hội đồng, GVHD, Sinh viên
+│  ├─ Flow cho mỗi phiên
+│  │  ├─ Điểm danh & khai mạc (SV, GVHD, hội đồng có mặt)
+│  │  ├─ Bảo vệ từng đồ án (theo order_in_session)
+│  │  │  ├─ SV trình bày → Phản biện/ủy viên đặt câu hỏi → SV trả lời, demo
+│  │  │  └─ Gán trạng thái `DEFENDING` trong lúc bảo vệ
+│  │  └─ Chấm điểm & nhận xét
+│  │     ├─ GVHD: `advisor_score`
+│  │     ├─ Hội đồng: `council_score`
+│  │     ├─ Thư ký ghi: `final_score`, `grade`, nhận xét
+│  │     └─ Gán trạng thái `GRADED`
+│  └─ Nghiệp vụ Hệ thống
+│     └─ Lưu điểm, cập nhật thesis status
+
+├─ 5. Chốt kết quả bảo vệ
+│  ├─ Actor: Hệ thống, PĐT
+│  ├─ Quy tắc
+│  │  ├─ `final_score` = hàm(advisor_score, council_score) theo quy chế
+│  │  └─ `grade`: A, B, C, D, F (hoặc Xuất sắc, Giỏi, Khá, TB…)
+│  ├─ Trạng thái sau chấm điểm
+│  │  ├─ `final_score` ≥ ngưỡng → `PASSED`
+│  │  └─ `final_score` < ngưỡng → `FAILED`
+│  └─ Chuỗi: `READY_FOR_DEFENSE` → `DEFENDING` → `GRADED` → `PASSED`/`FAILED`
+
+GIAI ĐOẠN 3: HOÀN THIỆN HỒ SƠ & LƯU TRỮ
+├─ Đầu vào: Thesis `PASSED` / `FAILED`
+├─ Đầu ra: Hồ sơ hoàn thiện, trạng thái `COMPLETED`, lưu trữ lâu dài
+
+├─ 1. Nộp bản cuối sau bảo vệ (Final Submission)
+│  ├─ Actor: Sinh viên, GVHD, Chủ tịch hội đồng
+│  ├─ Bối cảnh
+│  │  └─ Hội đồng có thể yêu cầu sửa báo cáo, bổ sung phụ lục, cập nhật code
+│  ├─ Nghiệp vụ Hệ thống / Hội đồng
+│  │  └─ Ghi nhận yêu cầu chỉnh sửa (advisor_comment, fix_required_notes)
+│  ├─ Nghiệp vụ Sinh viên
+│  │  └─ Upload bản đã sửa: final_report, final_slide, final_source_code
+│  │     Trạng thái: `PENDING_FIX` → `FIX_SUBMITTED`
+│  ├─ Nghiệp vụ GVHD / Chủ tịch hội đồng
+│  │  ├─ Xem file đã nộp, đối chiếu yêu cầu
+│  │  ├─ Duyệt → `FIX_APPROVED` (bản chính thức)
+│  │  └─ Từ chối → `FIX_REJECTED` (SV chỉnh sửa lại)
+│  └─ Nghiệp vụ Hệ thống
+│     └─ Khi `FIX_APPROVED`: chốt bộ file Final, không cho nộp thêm (trừ mở lại bởi PĐT/GVHD)
+
+├─ 2. Chốt kết quả & cập nhật trạng thái thesis
+│  ├─ Actor: PĐT, Hệ thống
+│  ├─ Điều kiện
+│  │  ├─ Đã có điểm (final_score, grade)
+│  │  ├─ Trạng thái `PASSED` / `FAILED`
+│  │  └─ Hồ sơ final `FIX_APPROVED` (nếu có yêu cầu sửa)
+│  ├─ Nghiệp vụ Hệ thống
+│  │  ├─ Cập nhật thesis: `GRADED` → `PASSED`/`FAILED` → `COMPLETED`
+│  │  ├─ Ghi `completed_at`
+│  │  └─ Log thao tác chốt điểm, xác nhận hoàn thiện
+
+├─ 3. Cập nhật trạng thái sinh viên & xét tốt nghiệp
+│  ├─ Actor: PĐT, Hệ thống đào tạo
+│  ├─ Cách 1 (chỉ lưu thesis)
+│  │  └─ Hệ thống khác đọc thesis `COMPLETED` + `PASSED` để xét tốt nghiệp
+│  └─ Cách 2 (lưu student_status)
+│     ├─ Thesis `COMPLETED` + `PASSED` → `student_status = THESIS_COMPLETED`
+│     └─ PĐT chốt tốt nghiệp → `student_status = GRADUATED`
+
+└─ 4. Lưu trữ & tra cứu hồ sơ đồ án
+   ├─ Nội dung lưu trữ (mỗi thesis)
+   │  ├─ Thông tin: SV, đề tài, GVHD, đợt, ngành, khóa
+   │  ├─ File: báo cáo, slide, code, biên bản, phiếu điểm
+   │  └─ Kết quả: advisor_score, council_score, final_score, grade, completed_at
+   ├─ Tra cứu
+   │  ├─ PĐT / Khoa / Ngành: theo năm, đợt, ngành, GVHD, xếp loại; thống kê, báo cáo
+   │  ├─ Giảng viên: xem đồ án đã hướng dẫn, tham khảo
+   │  └─ Sinh viên (tùy chính sách): danh sách đề tài khóa trước, link báo cáo mẫu
+   └─ Chuỗi trạng thái GĐ1→GĐ3
+      GĐ1: ELIGIBLE_FOR_THESIS → TOPIC_* → OUTLINE_* → IN_PROGRESS
+           → DEFENSE_REQUESTED → DEFENSE_APPROVED → READY_FOR_DEFENSE
+      GĐ2: READY_FOR_DEFENSE → DEFENDING → GRADED → PASSED / FAILED
+      GĐ3: PASSED / FAILED → (hoàn thiện hồ sơ) → COMPLETED → (xét TN) GRADUATED
 ```
 
 
