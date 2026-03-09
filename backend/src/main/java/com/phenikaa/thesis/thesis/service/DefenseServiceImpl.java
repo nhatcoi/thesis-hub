@@ -156,9 +156,9 @@ public class DefenseServiceImpl implements DefenseService {
         reg.setReviewedAt(OffsetDateTime.now());
         defenseRepo.save(reg);
 
-        // Update thesis status
+        // Update thesis status: APPROVED → READY_FOR_DEFENSE (Phase 1 complete)
         thesis.setStatus(regStatus == DefenseRegStatus.APPROVED
-                ? ThesisStatus.DEFENSE_APPROVED : ThesisStatus.DEFENSE_REJECTED);
+                ? ThesisStatus.READY_FOR_DEFENSE : ThesisStatus.DEFENSE_REJECTED);
         thesisRepo.save(thesis);
 
         // Notify student
