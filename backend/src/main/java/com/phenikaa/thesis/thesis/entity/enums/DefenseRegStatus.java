@@ -1,7 +1,7 @@
 package com.phenikaa.thesis.thesis.entity.enums;
 
 public enum DefenseRegStatus {
-    REQUESTED,
+    SUBMITTED,
     APPROVED,
     REJECTED
 }

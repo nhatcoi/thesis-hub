@@ -89,6 +89,8 @@ export class ThesisService {
         outlineEnd: string;
         implementationStart: string;
         implementationEnd: string;
+        defenseRegStart: string;
+        defenseRegEnd: string;
         thesisStatus: string;
         thesisId: string;
         topicTitle?: string;
@@ -103,6 +105,8 @@ export class ThesisService {
             outlineEnd: string;
             implementationStart: string;
             implementationEnd: string;
+            defenseRegStart: string;
+            defenseRegEnd: string;
             thesisStatus: string;
             thesisId: string;
             topicTitle?: string;

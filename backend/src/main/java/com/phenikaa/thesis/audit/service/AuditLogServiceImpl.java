@@ -117,6 +117,13 @@ public class AuditLogServiceImpl implements AuditLogService {
                 yield res + " tiến độ tuần " + data.get("weekNumber") + " của SV: " + data.get("studentName") + " (" + data.get("studentCode") + ")";
             }
 
+            case "REGISTER_DEFENSE" -> "Đã đăng ký bảo vệ (báo cáo: " + data.get("reportName") + ", code: " + data.get("sourceCodeName") + ", slide: " + data.get("slideName") + ")";
+            case "REVIEW_DEFENSE" -> {
+                String status = String.valueOf(data.get("status"));
+                String res = "APPROVED".equals(status) ? "Đã duyệt" : "Đã từ chối";
+                yield res + " đăng ký bảo vệ của SV: " + data.get("studentName") + " (" + data.get("studentCode") + ")";
+            }
+
             default -> "Thao tác " + log.getAction() + " trên " + log.getEntityType() + " (ID: " + log.getEntityId() + ")";
         };
     }
