@@ -3,11 +3,12 @@ import { AuthService } from '../../core/auth.service';
 import { MatIconModule } from '@angular/material/icon';
 import { DashboardService, DashboardStats } from '../../core/dashboard.service';
 import { CommonModule } from '@angular/common';
+import { ThesisStepperComponent } from '../shared/thesis-stepper.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [MatIconModule, CommonModule],
+  imports: [MatIconModule, CommonModule, ThesisStepperComponent],
   template: `
     <div class="space-y-6">
       @if (loading()) {
@@ -228,11 +229,7 @@ import { CommonModule } from '@angular/common';
         
         <!-- Other roles sections can remain as placeholders or follow similar patterns -->
         @if (auth.currentUser()?.activeRole === 'STUDENT') {
-          <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-6 text-center">
-            <mat-icon class="text-indigo-400 !text-[48px] mb-2">dashboard_customize</mat-icon>
-            <h3 class="text-lg font-bold text-indigo-900">Tính năng đang phát triển</h3>
-            <p class="text-indigo-600">Giao diện Dashboard dành riêng cho Sinh viên đang được tối ưu hóa.</p>
-          </div>
+          <app-thesis-stepper></app-thesis-stepper>
         }
       }
     </div>

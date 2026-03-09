@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService, Role } from '../core/auth.service';
 import { NotificationService } from '../core/notification.service';
@@ -13,7 +13,19 @@ interface MenuItem {
   exact: boolean;
 }
 
-const MENU_MAP: Record<string, MenuItem[]> = {
+interface MenuGroup {
+  title: string;
+  icon: string;
+  items: MenuItem[];
+}
+
+type MenuEntry = MenuItem | MenuGroup;
+
+function isGroup(entry: MenuEntry): entry is MenuGroup {
+  return 'items' in entry;
+}
+
+const MENU_MAP: Record<string, MenuEntry[]> = {
   ADMIN: [
     { path: '/pdt/users', label: 'Quản lý người dùng', icon: 'people', exact: false },
     { path: '/pdt/batches', label: 'Quản lý đợt đồ án', icon: 'date_range', exact: false },
@@ -35,19 +47,31 @@ const MENU_MAP: Record<string, MenuItem[]> = {
     { path: '/head/history', label: 'Lịch sử của tôi', icon: 'history', exact: false },
   ],
   LECTURER: [
-    { path: '/lecturer/topics', label: 'Đề tài của tôi', icon: 'library_books', exact: false },
-    { path: '/lecturer/requests', label: 'Yêu cầu đăng ký', icon: 'how_to_reg', exact: false },
-    { path: '/lecturer/outlines', label: 'Duyệt đề cương', icon: 'description', exact: false },
-    { path: '/lecturer/progress', label: 'Theo dõi tiến độ', icon: 'trending_up', exact: false },
-    { path: '/lecturer/defenses', label: 'Duyệt bảo vệ', icon: 'gavel', exact: false },
+    {
+      title: 'Đăng ký & thực hiện ĐA',
+      icon: 'auto_stories',
+      items: [
+        { path: '/lecturer/topics', label: 'Đề tài của tôi', icon: 'library_books', exact: false },
+        { path: '/lecturer/requests', label: 'Yêu cầu đăng ký', icon: 'how_to_reg', exact: false },
+        { path: '/lecturer/outlines', label: 'Duyệt đề cương', icon: 'description', exact: false },
+        { path: '/lecturer/progress', label: 'Theo dõi tiến độ', icon: 'trending_up', exact: false },
+        { path: '/lecturer/defenses', label: 'Duyệt bảo vệ', icon: 'gavel', exact: false },
+      ]
+    },
     { path: '/lecturer/notifications', label: 'Thông báo', icon: 'notifications', exact: false },
     { path: '/lecturer/history', label: 'Lịch sử của tôi', icon: 'history', exact: false },
   ],
   STUDENT: [
-    { path: '/student/topics', label: 'Đăng ký đề tài', icon: 'search', exact: false },
-    { path: '/student/outline', label: 'Nộp đề cương', icon: 'upload_file', exact: false },
-    { path: '/student/progress', label: 'Cập nhật tiến độ', icon: 'update', exact: false },
-    { path: '/student/defense', label: 'Đăng ký bảo vệ', icon: 'school', exact: false },
+    {
+      title: 'Đăng ký & thực hiện ĐA',
+      icon: 'auto_stories',
+      items: [
+        { path: '/student/topics', label: 'Đăng ký đề tài', icon: 'search', exact: false },
+        { path: '/student/outline', label: 'Nộp đề cương', icon: 'upload_file', exact: false },
+        { path: '/student/progress', label: 'Cập nhật tiến độ', icon: 'update', exact: false },
+        { path: '/student/defense', label: 'Đăng ký bảo vệ', icon: 'school', exact: false },
+      ]
+    },
     { path: '/student/notifications', label: 'Thông báo', icon: 'notifications', exact: false },
     { path: '/student/history', label: 'Lịch sử của tôi', icon: 'history', exact: false },
   ],
@@ -71,14 +95,50 @@ const MENU_MAP: Record<string, MenuItem[]> = {
           </div>
         </div>
         
-        <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1.5 scrollbar-hide">
-          @for (item of menuItems(); track item.path) {
-            <a [routerLink]="item.path" routerLinkActive="!bg-white !text-indigo-600 shadow-sm border-indigo-100"
-               [routerLinkActiveOptions]="{exact: item.exact}"
-               class="flex items-center px-3 py-2 text-[12px] font-bold rounded-lg text-gray-500 hover:bg-white hover:text-indigo-600 border border-transparent transition-all group">
-              <mat-icon class="mr-3 !text-lg text-gray-300 group-hover:text-indigo-400">{{item.icon}}</mat-icon>
-              {{item.label}}
-            </a>
+        <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1 scrollbar-hide">
+          <!-- Dashboard (always first) -->
+          <a routerLink="/dashboard" routerLinkActive="!bg-white !text-indigo-600 shadow-sm border-indigo-100"
+             [routerLinkActiveOptions]="{exact: true}"
+             class="flex items-center px-3 py-2 text-[12px] font-bold rounded-lg text-gray-500 hover:bg-white hover:text-indigo-600 border border-transparent transition-all group">
+            <mat-icon class="mr-3 !text-lg text-gray-300 group-hover:text-indigo-400">dashboard</mat-icon>
+            Dashboard
+          </a>
+
+          @for (entry of menuEntries(); track $index) {
+            @if (isMenuGroup(entry)) {
+              <!-- Group header -->
+              <div class="pt-3">
+                <button (click)="toggleGroup(entry.title)"
+                  class="w-full flex items-center justify-between px-3 py-1.5 rounded-lg hover:bg-gray-100/80 transition-all group cursor-pointer">
+                  <div class="flex items-center gap-2">
+                    <mat-icon class="!text-[14px] !w-4 !h-4 text-indigo-400">{{ entry.icon }}</mat-icon>
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ entry.title }}</span>
+                  </div>
+                  <mat-icon class="!text-[16px] !w-4 !h-4 text-gray-300 transition-transform duration-200"
+                    [class.rotate-180]="isGroupOpen(entry.title)">expand_more</mat-icon>
+                </button>
+                @if (isGroupOpen(entry.title)) {
+                  <div class="mt-1 space-y-0.5 pl-1 border-l-2 border-indigo-100 ml-4">
+                    @for (item of entry.items; track item.path) {
+                      <a [routerLink]="item.path" routerLinkActive="!bg-white !text-indigo-600 shadow-sm border-indigo-100"
+                         [routerLinkActiveOptions]="{exact: item.exact}"
+                         class="flex items-center px-3 py-1.5 text-[11px] font-bold rounded-lg text-gray-500 hover:bg-white hover:text-indigo-600 border border-transparent transition-all group">
+                        <mat-icon class="mr-2.5 !text-base text-gray-300 group-hover:text-indigo-400">{{item.icon}}</mat-icon>
+                        {{item.label}}
+                      </a>
+                    }
+                  </div>
+                }
+              </div>
+            } @else {
+              <!-- Single item -->
+              <a [routerLink]="entry.path" routerLinkActive="!bg-white !text-indigo-600 shadow-sm border-indigo-100"
+                 [routerLinkActiveOptions]="{exact: entry.exact}"
+                 class="flex items-center px-3 py-2 text-[12px] font-bold rounded-lg text-gray-500 hover:bg-white hover:text-indigo-600 border border-transparent transition-all group">
+                <mat-icon class="mr-3 !text-lg text-gray-300 group-hover:text-indigo-400">{{entry.icon}}</mat-icon>
+                {{entry.label}}
+              </a>
+            }
           }
         </nav>
         
@@ -154,6 +214,8 @@ export class LayoutComponent implements OnInit {
   notificationService = inject(NotificationService);
   private router = inject(Router);
 
+  openGroups = signal<Set<string>>(new Set(['Đăng ký & thực hiện ĐA']));
+
   ngOnInit(): void {
     if (this.auth.isLoggedIn()) {
       this.notificationService.loadUnreadCount();
@@ -161,12 +223,27 @@ export class LayoutComponent implements OnInit {
     }
   }
 
-  menuItems(): MenuItem[] {
+  menuEntries(): MenuEntry[] {
     const role = this.auth.currentUser()?.activeRole;
-    const base: MenuItem[] = [
-      { path: '/dashboard', label: 'Dashboard', icon: 'dashboard', exact: true },
-    ];
-    return role ? [...base, ...(MENU_MAP[role] ?? [])] : base;
+    return role ? (MENU_MAP[role] ?? []) : [];
+  }
+
+  isMenuGroup(entry: MenuEntry): entry is MenuGroup {
+    return isGroup(entry);
+  }
+
+  toggleGroup(title: string): void {
+    const current = new Set(this.openGroups());
+    if (current.has(title)) {
+      current.delete(title);
+    } else {
+      current.add(title);
+    }
+    this.openGroups.set(current);
+  }
+
+  isGroupOpen(title: string): boolean {
+    return this.openGroups().has(title);
   }
 
   activeRoleLabel(): string {
