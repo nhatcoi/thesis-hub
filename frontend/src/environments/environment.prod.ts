@@ -5,7 +5,7 @@ export const environment = {
     issuer: 'https://sso.openpka.site',
     clientId: '362708277525544962@thesis_management_system',
     scope: 'openid profile email offline_access urn:zitadel:iam:org:project:roles',
-    redirectUri: 'https://thesis.openpka.site',
-    postLogoutRedirectUri: 'https://thesis.openpka.site/login',
+    redirectUri: 'https://datn.openpka.site/',
+    postLogoutRedirectUri: 'https://datn.openpka.site/login',
   },
 };
