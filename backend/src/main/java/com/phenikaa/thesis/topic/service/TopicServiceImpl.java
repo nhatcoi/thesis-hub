@@ -1,11 +1,11 @@
 package com.phenikaa.thesis.topic.service;
 
 import com.phenikaa.thesis.batch.entity.ThesisBatch;
-import com.phenikaa.thesis.batch.repository.ThesisBatchRepository;
+import com.phenikaa.thesis.batch.service.BatchService;
 import com.phenikaa.thesis.common.exception.BusinessException;
 import com.phenikaa.thesis.common.exception.ResourceNotFoundException;
 import com.phenikaa.thesis.organization.entity.Major;
-import com.phenikaa.thesis.organization.repository.MajorRepository;
+import com.phenikaa.thesis.organization.service.MajorService;
 import com.phenikaa.thesis.thesis.entity.Thesis;
 import com.phenikaa.thesis.thesis.repository.ThesisRepository;
 import com.phenikaa.thesis.topic.dto.TopicDetailResponse;
@@ -41,8 +41,8 @@ import java.util.UUID;
 public class TopicServiceImpl implements TopicService {
 
     private final TopicRepository topicRepo;
-    private final ThesisBatchRepository batchRepo;
-    private final MajorRepository majorRepo;
+    private final BatchService batchService;
+    private final MajorService majorService;
     private final UserRepository userRepo;
     private final TopicRegistrationRepository registrationRepo;
     private final ThesisRepository thesisRepo;
@@ -95,15 +95,10 @@ public class TopicServiceImpl implements TopicService {
         User proposer = topic.getProposedBy();
         Lecturer lecturer = proposer.getLecturer();
 
-        String majorName = null;
-        String facultyName = null;
-        if (topic.getMajorCode() != null) {
-            Major major = majorRepo.findByCode(topic.getMajorCode()).orElse(null);
-            if (major != null) {
-                majorName = major.getName();
-                if (major.getFaculty() != null) facultyName = major.getFaculty().getName();
-            }
-        }
+        Major major = majorService.findByCode(topic.getMajorCode()).orElse(null);
+        String majorName = major != null ? major.getName() : null;
+        String facultyName = (major != null && major.getFaculty() != null) ? major.getFaculty().getName() : null;
+
         if (facultyName == null && lecturer != null && lecturer.getFaculty() != null) {
             facultyName = lecturer.getFaculty().getName();
         }
@@ -142,7 +137,7 @@ public class TopicServiceImpl implements TopicService {
     @Transactional
     @Auditable(action = "CREATE_TOPIC", entityType = "Topic")
     public TopicResponse createTopic(User user, TopicRequest req) {
-        ThesisBatch batch = batchRepo.findById(req.getBatchId())
+        ThesisBatch batch = batchService.findById(req.getBatchId())
                 .orElseThrow(() -> new ResourceNotFoundException("ThesisBatch", "id", req.getBatchId()));
         Topic topic = Topic.builder()
                 .title(req.getTitle()).description(req.getDescription())
@@ -214,9 +209,7 @@ public class TopicServiceImpl implements TopicService {
 
     private TopicResponse enrichTopicResponse(Topic topic) {
         TopicResponse response = topicMapper.toResponse(topic);
-        if (topic.getMajorCode() != null) {
-            majorRepo.findByCode(topic.getMajorCode()).ifPresent(m -> response.setMajorName(m.getName()));
-        }
+        response.setMajorName(majorService.getMajorName(topic.getMajorCode()));
         return response;
     }
 
@@ -224,11 +217,10 @@ public class TopicServiceImpl implements TopicService {
             com.phenikaa.thesis.topic.entity.enums.RegistrationStatus regStatus,
             java.time.OffsetDateTime registeredAt,
             com.phenikaa.thesis.thesis.entity.enums.ThesisStatus thesisStatus) {
-        String majorName = s.getMajorCode() != null
-                ? majorRepo.findByCode(s.getMajorCode()).map(Major::getName).orElse(null) : null;
         return TopicDetailResponse.StudentInfo.builder()
                 .studentId(s.getId()).studentName(topicMapper.fullName(s.getUser()))
-                .studentCode(s.getStudentCode()).majorCode(s.getMajorCode()).majorName(majorName)
+                .studentCode(s.getStudentCode()).majorCode(s.getMajorCode())
+                .majorName(majorService.getMajorName(s.getMajorCode()))
                 .registrationStatus(regStatus).registeredAt(registeredAt).thesisStatus(thesisStatus)
                 .build();
     }

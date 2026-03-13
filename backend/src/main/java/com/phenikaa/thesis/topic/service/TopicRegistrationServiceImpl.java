@@ -19,7 +19,7 @@ import com.phenikaa.thesis.topic.mapper.TopicMapper;
 import com.phenikaa.thesis.topic.validator.TopicRegistrationValidator;
 import com.phenikaa.thesis.topic.repository.TopicRegistrationRepository;
 import com.phenikaa.thesis.topic.repository.TopicRepository;
-import com.phenikaa.thesis.batch.repository.ThesisBatchRepository;
+import com.phenikaa.thesis.batch.service.BatchService;
 import com.phenikaa.thesis.notification.entity.enums.NotificationType;
 import com.phenikaa.thesis.notification.service.NotificationService;
 import com.phenikaa.thesis.user.entity.Lecturer;
@@ -46,7 +46,7 @@ public class TopicRegistrationServiceImpl implements TopicRegistrationService {
 
     private final TopicRegistrationRepository registrationRepo;
     private final TopicRepository topicRepo;
-    private final ThesisBatchRepository batchRepo;
+    private final BatchService batchService;
     private final ThesisRepository thesisRepo;
     private final LecturerRepository lecturerRepo;
     private final NotificationService notificationService;
@@ -139,8 +139,8 @@ public class TopicRegistrationServiceImpl implements TopicRegistrationService {
 
         if (student.getEligibleForThesis() != null && !student.getEligibleForThesis())
             throw new BusinessException("Bạn chưa đủ điều kiện làm đồ án. Vui lòng liên hệ Phòng Đào tạo.");
-
-        ThesisBatch batch = batchRepo.findById(req.getBatchId())
+ 
+        ThesisBatch batch = batchService.findById(req.getBatchId())
                 .orElseThrow(() -> new ResourceNotFoundException("ThesisBatch", "id", req.getBatchId()));
         registrationValidator.validateBatchRegistrationWindow(batch);
 
